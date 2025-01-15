@@ -18,6 +18,7 @@ export const createConnection = async (): Promise<mariadb.PoolConnection> => {
   return mariadbPool
     .getConnection()
     .then((connection: mariadb.PoolConnection) => {
+      console.log("DB connected successfully");
       return connection;
     })
     .catch((err) => {
