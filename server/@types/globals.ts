@@ -13,4 +13,7 @@ export type ComponentInfo = {
   suppliers_name: string;
   suppliers_contact_details: string;
   receipt_date: string;
+  cabinet: string;
+  shelf: string;
+  drawer: string;
 };
