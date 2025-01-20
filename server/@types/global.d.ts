@@ -14,3 +14,12 @@ export type ComponentInfo = {
   suppliers_contact_details: string;
   receipt_date: string;
 };
+
+export type DeviceInfo = {
+  name: string;
+  purpose: string;
+  electrical_supply: string;
+  size: string;
+  available_quantity: string;
+  unit_cost: string;
+};

@@ -1,10 +1,7 @@
 import { Request, Response } from "express";
 import { createConnection } from "../db/database";
 import { ResponseStatus } from "../@types/type";
-<<<<<<< HEAD
-=======
 import { ComponentInfo } from "../@types/global";
->>>>>>> f8a9e46c928d6fa62a119681ce8c02c72b8ac3ba
 
 export const getComponents = async (req: Request, res: Response) => {
   let conn;
