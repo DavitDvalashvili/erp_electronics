@@ -5,7 +5,7 @@ const { DB_HOST, DB_NAME, DB_USER, DB_PORT, DB_PASSWORD, SQL_PORT } =
 
 const mariadbPoolConfig: mariadb.PoolConfig = {
   host: DB_HOST,
-  //port: 3308,
+  port: 3308,
   user: DB_USER,
   password: DB_PASSWORD,
   database: DB_NAME,

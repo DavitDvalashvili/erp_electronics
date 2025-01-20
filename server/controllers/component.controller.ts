@@ -6,13 +6,15 @@ import { ResponseStatus } from "../@types/type";
 export const getComponents = async (req: Request, res: Response) => {
   let conn;
 
-  // Extract filtering parameters
   const name = (req.query.name as string) || "";
   const family = (req.query.family as string) || "";
   const package_type = (req.query.package_type as string) || "";
   const nominal_value = (req.query.nominal_value as string) || "";
   const electrical_supply = (req.query.electrical_supply as string) || "";
   const suppliers_name = (req.query.suppliers_name as string) || "";
+  const cabinet = (req.query.cabinet as string) || "";
+  const shelf = (req.query.shelf as string) || "";
+  const drawer = (req.query.drawer as string) || "";
 
   const searchTerm = (req.query.searchTerm as string) || "";
   const page = parseInt(req.query.page as string, 10) || 1;
@@ -27,7 +29,7 @@ export const getComponents = async (req: Request, res: Response) => {
       SELECT 
       c.name, c.family, c.package_type, c.nominal_value, c.electrical_supply, 
       c.unit_cost, c.available_quantity, c.required_quantity, s.cabinet, 
-      s.drawer, s.shelf,
+      s.shelf, s.drawer,
       (SELECT i.image_url
       FROM images i
       WHERE i.component_id = c.id
@@ -36,9 +38,13 @@ export const getComponents = async (req: Request, res: Response) => {
       JOIN storage s ON s.component_id = c.id
       WHERE (c.name LIKE ? OR c.family LIKE ? OR c.package_type LIKE ?
              OR c.nominal_value LIKE ? OR c.electrical_supply LIKE ? 
-             OR c.suppliers_name LIKE ?)`;
+             OR c.suppliers_name LIKE ? OR s.cabinet LIKE ? OR s.shelf LIKE ? 
+             OR s.drawer LIKE ?)`;
 
     const params: (string | number)[] = [
+      `%${searchTerm}%`,
+      `%${searchTerm}%`,
+      `%${searchTerm}%`,
       `%${searchTerm}%`,
       `%${searchTerm}%`,
       `%${searchTerm}%`,
@@ -72,6 +78,18 @@ export const getComponents = async (req: Request, res: Response) => {
       query += ` AND c.suppliers_name LIKE ?`;
       params.push(`%${suppliers_name}%`);
     }
+    if (cabinet) {
+      query += ` AND s.cabinet LIKE ?`;
+      params.push(`%${cabinet}%`);
+    }
+    if (shelf) {
+      query += ` AND s.shelf LIKE ?`;
+      params.push(`%${shelf}%`);
+    }
+    if (drawer) {
+      query += ` AND s.drawer LIKE ?`;
+      params.push(`%${drawer}%`);
+    }
 
     // Add pagination
     query += ` LIMIT ? OFFSET ?`;
@@ -81,13 +99,19 @@ export const getComponents = async (req: Request, res: Response) => {
     const components = await conn.query(query, params);
 
     res.send({ components });
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    console.log(error);
     res
       .status(500)
-      .send({ error: "An error occurred while fetching components." });
+      .send({ "An error occurred while fetching components:": error });
   } finally {
-    if (conn) conn.release();
+    if (conn) {
+      try {
+        conn.release();
+      } catch (error) {
+        console.error("An error occurred while fetching components:", error);
+      }
+    }
   }
 };
 
@@ -119,8 +143,6 @@ export const getComponent = async (req: Request, res: Response) => {
 
     const component = await conn.query(query, [id]);
 
-    console.log(id);
-
     res.send(component);
   } catch (err) {
     console.log(err);
@@ -137,6 +159,8 @@ export const addComponent = async (
   res: Response
 ): Promise<void> => {
   let conn;
+  let status: ResponseStatus;
+
   const {
     family,
     name,
@@ -176,7 +200,6 @@ export const addComponent = async (
 
     if (!name || !available_quantity || !required_quantity) {
       res.status(404).send({ message: "Empty required fields" });
-      return;
     }
 
     let existingComponent = await conn.query(
@@ -185,8 +208,8 @@ export const addComponent = async (
     );
 
     if (existingComponent.length > 0) {
-      let status: ResponseStatus = {
-        status: "insert_exist",
+      status = {
+        status: "insert_exists",
         message: "Component already exists",
       };
       res.status(409).json(status);
@@ -201,18 +224,198 @@ export const addComponent = async (
    VALUES 
     (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) `;
 
-    await conn.query(insertQuery, [...componentInfo]).then(() => {
-      let status: ResponseStatus = {
-        status: "inserted",
-        message: "Component inserted successfully",
+    await conn
+      .query(insertQuery, [...componentInfo])
+      .then(() => {
+        status = {
+          status: "inserted",
+          message: "Component inserted successfully",
+        };
+        res.send(status);
+      })
+      .catch((err) => {
+        status = {
+          status: "insert_error",
+          message: "An error occurred while adding component.",
+        };
+        res.send(status);
+        console.log(err);
+      });
+  } catch (err) {
+    console.log(err);
+    status = {
+      status: "insert_error",
+      message: "An error occurred while adding component.",
+    };
+    res.status(500).send(status);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
+export const updateComponent = async (req: Request, res: Response) => {
+  let conn;
+  let id = req.params.id as string;
+
+  let status: ResponseStatus;
+
+  const {
+    family,
+    name,
+    purpose,
+    package_type,
+    nominal_value,
+    electrical_supply,
+    unit_cost,
+    other_cost,
+    available_quantity,
+    required_quantity,
+    invoice_number,
+    suppliers_name,
+    suppliers_contact_details,
+    receipt_date,
+  } = <ComponentInfo>req.body;
+
+  const componentInfo = [
+    family,
+    name,
+    purpose,
+    package_type,
+    nominal_value,
+    electrical_supply,
+    unit_cost,
+    other_cost,
+    available_quantity,
+    required_quantity,
+    invoice_number,
+    suppliers_name,
+    suppliers_contact_details,
+    receipt_date,
+  ];
+
+  try {
+    conn = await createConnection();
+
+    let existingComponent = await conn.query(
+      `SELECT * FROM components WHERE name = ? AND id != ?`,
+      [name, id]
+    );
+
+    if (existingComponent.length > 0) {
+      status = {
+        status: "update_exists",
+        message: "Component already exists",
+      };
+      res.status(409).json(status);
+      return;
+    }
+
+    const updateQuery = `
+      UPDATE components
+      SET 
+        family = ?, 
+        name = ?, 
+        purpose = ?, 
+        package_type = ?, 
+        nominal_value = ?, 
+        electrical_supply = ?, 
+        unit_cost = ?, 
+        other_cost = ?,
+        available_quantity = ?, 
+        required_quantity = ?,
+        invoice_number = ?, 
+        suppliers_name = ?, 
+        suppliers_contact_details = ?, 
+        receipt_date = ?
+      WHERE id = ?`;
+
+    await conn
+      .query(updateQuery, [...componentInfo, id])
+      .then(() => {
+        status = {
+          status: "updated",
+          message: "Component updated successfully",
+        };
+        res.send(status);
+      })
+      .catch((err) => {
+        status = {
+          status: "update_error",
+          message: "An error occurred while updating component.",
+        };
+        res.send(status);
+        console.log(err);
+      });
+  } catch (err) {
+    console.log(err);
+    status = {
+      status: "update_error",
+      message: "An error occurred while updating component.",
+    };
+    res.status(500).send(status);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
+export const deleteComponent = async (req: Request, res: Response) => {
+  let conn;
+  const id = req.params.id as string;
+
+  let status: ResponseStatus;
+
+  try {
+    conn = await createConnection();
+    const query = `DELETE FROM components WHERE id = ?`;
+
+    const result = await conn.query(query, [id]);
+
+    if (result.affectedRows === 0) {
+      res.status(404).send({ message: "component not found" });
+      return;
+    } else {
+      status = {
+        status: "deleted",
+        message: "Component deleted successfully",
       };
       res.send(status);
-    });
+    }
+  } catch (err) {
+    status = {
+      status: "delete_error",
+      message: "An error occurred while deleting component.",
+    };
+    res.status(500).send(status);
+    console.log(err);
+  } finally {
+    if (conn) await conn.release();
+  }
+};
+
+export const getFilterTerms = async (req: Request, res: Response) => {
+  let conn;
+  try {
+    conn = await createConnection();
+    let query = `SELECT 
+    c.name, c.family, c.package_type, c.nominal_value, c.electrical_supply, 
+    c.unit_cost, c.available_quantity, c.required_quantity, s.cabinet, 
+    s.drawer, s.shelf FROM components c
+    JOIN storage s ON c.id = s.component_id`;
+
+    const filterTerms = await conn.query(query);
+
+    if (filterTerms.length == 0) {
+      res
+        .status(404)
+        .send({ error: "An error occurred while fetching filter terms" });
+    }
+
+    res.send(filterTerms);
   } catch (err) {
     console.log(err);
     res
       .status(500)
-      .send({ error: "An error occurred while adding component." });
+      .send({ error: "An error occurred while fetching filter terms" });
   } finally {
     if (conn) conn.release();
   }

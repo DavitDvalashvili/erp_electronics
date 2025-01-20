@@ -1,7 +1,7 @@
 export type ResponseStatus = {
   status:
     | "inserted"
-    | "insert_exist"
+    | "insert_exists"
     | "insert_error"
     | "updated"
     | "update_exists"
