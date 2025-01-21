@@ -14,7 +14,7 @@ componentRouter.get("/getComponents", getComponents);
 componentRouter.get("/getComponent/:id", getComponent);
 componentRouter.post("/addComponent", addComponent);
 componentRouter.post("/updateComponent/:id", updateComponent);
-componentRouter.get("/component/GetFilterTerms", getFilterTerms);
 componentRouter.delete("/deleteComponent/:id", deleteComponent);
+componentRouter.get("/component/getFilterTerms", getFilterTerms);
 
 export default componentRouter;

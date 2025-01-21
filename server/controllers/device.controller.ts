@@ -273,3 +273,63 @@ export const updateDevice = async (req: Request, res: Response) => {
     if (conn) conn.release();
   }
 };
+
+export const deleteDevice = async (req: Request, res: Response) => {
+  let conn;
+  const id = req.params.id as string;
+
+  let status: ResponseStatus;
+
+  try {
+    conn = await createConnection();
+    const query = `DELETE FROM devices WHERE id = ?`;
+
+    const result = await conn.query(query, [id]);
+
+    if (result.affectedRows === 0) {
+      res.status(404).send({ message: "device not found." });
+      return;
+    } else {
+      status = {
+        status: "deleted",
+        message: "Device deleted successfully.",
+      };
+      res.send(status);
+    }
+  } catch (err) {
+    status = {
+      status: "delete_error",
+      message: "An error occurred while deleting device.",
+    };
+    res.status(500).send(status);
+    console.log(err);
+  } finally {
+    if (conn) await conn.release();
+  }
+};
+
+export const getFilterTerms = async (req: Request, res: Response) => {
+  let conn;
+  try {
+    conn = await createConnection();
+    let query = `SELECT 
+    d.name, d.d.electrical_supply, d.size FROM devices`;
+
+    const filterTerms = await conn.query(query);
+
+    if (filterTerms.length == 0) {
+      res
+        .status(404)
+        .send({ error: "An error occurred while fetching filter terms" });
+    }
+
+    res.send(filterTerms);
+  } catch (err) {
+    console.log(err);
+    res
+      .status(500)
+      .send({ error: "An error occurred while fetching filter terms" });
+  } finally {
+    if (conn) conn.release();
+  }
+};
