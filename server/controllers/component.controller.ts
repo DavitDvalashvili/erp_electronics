@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { createConnection } from "../db/database";
 import { ResponseStatus } from "../@types/type";
-import { ComponentInfo } from "../@types/global";
+import { ComponentInfo, StorageInfo } from "../@types/global";
 
 export const getComponents = async (req: Request, res: Response) => {
   let conn;
@@ -416,6 +416,61 @@ export const getFilterTerms = async (req: Request, res: Response) => {
     res
       .status(500)
       .send({ error: "An error occurred while fetching filter terms" });
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
+export const addStorage = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const componentId = req.params.id as String;
+  let conn;
+  let status: ResponseStatus;
+
+  const { cabinet, shelf, drawer } = <StorageInfo>req.body;
+
+  let storageInfo = [cabinet, shelf, drawer];
+
+  try {
+    conn = await createConnection();
+
+    let existingComponent = await conn.query(
+      `SELECT * FROM components WHERE id = ?`,
+      [componentId]
+    );
+    if (existingComponent.length == 0) {
+      res.status(404).send({ message: "Component not found" });
+      return;
+    }
+
+    let insertQuery = `INSERT INTO storage (cabinet, shelf, drawer, component_id) VALUES (?, ?, ?, ?)`;
+
+    await conn
+      .query(insertQuery, [...storageInfo, componentId])
+      .then(() => {
+        status = {
+          status: "inserted",
+          message: "Storage inserted successfully",
+        };
+        res.send(status);
+      })
+      .catch((err) => {
+        status = {
+          status: "insert_error",
+          message: "An error occurred while adding storage.",
+        };
+        res.send(status);
+        console.log(err);
+      });
+  } catch (error) {
+    console.log(error);
+    status = {
+      status: "insert_error",
+      message: "An error occurred while adding storage.",
+    };
+    res.status(500).send(status);
   } finally {
     if (conn) conn.release();
   }

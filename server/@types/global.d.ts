@@ -23,3 +23,9 @@ export type DeviceInfo = {
   available_quantity: string;
   unit_cost: string;
 };
+
+export type StorageInfo = {
+  cabinet: string;
+  shelf: string;
+  drawer: string;
+};
