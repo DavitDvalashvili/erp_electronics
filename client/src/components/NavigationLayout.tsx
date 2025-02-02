@@ -1,4 +1,4 @@
-import { RxComponent1 } from "react-icons/rx";
+import { CgComponents } from "react-icons/cg";
 import { PiDeviceMobileSpeakerFill } from "react-icons/pi";
 import { IoMdNotifications } from "react-icons/io";
 import { RiTodoFill } from "react-icons/ri";
@@ -20,8 +20,8 @@ const NavigationLayout = () => {
 
   return (
     <div
-      className=" h-screen w-[38rem] flex flex-col justify-start items-center py-[4rem] gap-[8rem]
-      font-firago font-feature"
+      className=" h-screen min-w-[28rem] xl:min-w-[38rem] flex flex-col justify-start items-center py-[4rem] gap-[8rem]
+      font-firago font-feature bg-white"
     >
       <div>
         <img
@@ -34,15 +34,15 @@ const NavigationLayout = () => {
         <ul className="text-textColor text-[2rem] font-bold flex flex-col gap-[6rem]">
           <Link to="/components">
             <li
-              className={`flex gap-8 py-4 rounded-default px-[6rem] ${activePage === "components" ? "bg-bgColor text-white" : "text-textColor"}`}
+              className={`flex gap-8 py-4 rounded-default px-[3rem] xl:px-[6rem] ${activePage === "components" ? "bg-bgColor text-white" : "text-textColor"}`}
             >
-              <RxComponent1 className="w-[3rem] h-[3rem]" />
+              <CgComponents className="w-[3rem] h-[3rem]" />
               <span>კომპონენტები</span>
             </li>
           </Link>
           <Link to="/devices">
             <li
-              className={`flex gap-8 py-4 rounded-default px-[6rem] ${activePage === "devices" ? "bg-bgColor text-white" : "text-textColor"}`}
+              className={`flex gap-8 py-4 rounded-default px-[3rem] xl:px-[6rem] ${activePage === "devices" ? "bg-bgColor text-white" : "text-textColor"}`}
             >
               <PiDeviceMobileSpeakerFill className="w-[3rem] h-[3rem]" />
               <span>მოწყობილობები</span>
@@ -50,7 +50,7 @@ const NavigationLayout = () => {
           </Link>
           <Link to="/notification">
             <li
-              className={`flex gap-8 py-4 rounded-default px-[6rem] ${activePage === "notification" ? "bg-bgColor text-white" : "text-textColor"}`}
+              className={`flex gap-8 py-4 rounded-default px-[3rem] xl:px-[6rem] ${activePage === "notification" ? "bg-bgColor text-white" : "text-textColor"}`}
             >
               <IoMdNotifications className="w-[3rem] h-[3rem]" />
               <span>შეტყობინებები</span>
@@ -58,7 +58,7 @@ const NavigationLayout = () => {
           </Link>
           <Link to="/todo">
             <li
-              className={`flex gap-8 py-4 rounded-default px-[6rem] ${activePage === "todo" ? "bg-bgColor text-white" : "text-textColor"}`}
+              className={`flex gap-8 py-4 rounded-default px-[3rem] xl:px-[6rem] ${activePage === "todo" ? "bg-bgColor text-white" : "text-textColor"}`}
             >
               <RiTodoFill className="w-[3rem] h-[3rem]" />
               <span>საყიდლები</span>

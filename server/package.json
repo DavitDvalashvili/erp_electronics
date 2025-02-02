@@ -11,12 +11,14 @@
     "start": "nodemon -r dotenv/config index.ts"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "mariadb": "^3.4.0",
     "nodemon": "^3.1.9"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.6",
     "ts-node": "^10.9.2",

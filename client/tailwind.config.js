@@ -9,6 +9,7 @@ export default {
       },
       colors: {
         bgColor: "#063776",
+        bgColorSecondary: "#E0EAFC",
         textColor: "#334155",
         white: "#FFFEFE",
         black: "#1C1C1C",
@@ -18,6 +19,10 @@ export default {
       },
       borderRadius: {
         default: "10px",
+      },
+      screens: {
+        lg: "1440px",
+        xl: "1920px",
       },
     },
   },

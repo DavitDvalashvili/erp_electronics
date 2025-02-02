@@ -17,8 +17,8 @@ export const getComponents = async (req: Request, res: Response) => {
   const drawer = (req.query.drawer as string) || "";
 
   const searchTerm = (req.query.searchTerm as string) || "";
-  const page = parseInt(req.query.page as string, 10) || 1;
-  const pageSize = 4;
+  const page = parseInt(req.query.page as string) || 1;
+  const pageSize = parseInt(req.query.pageSize as string);
   const offset = (page - 1) * pageSize;
 
   try {
@@ -27,16 +27,16 @@ export const getComponents = async (req: Request, res: Response) => {
     // Base query
     let query = `
       SELECT 
-      c.name, c.family, c.package_type, c.nominal_value, c.electrical_supply, 
-      c.unit_cost, c.available_quantity, c.required_quantity, s.cabinet, 
-      s.shelf, s.drawer,
-      (SELECT i.image_url
-      FROM images i
-      WHERE i.component_id = c.id
-      LIMIT 1) AS image 
+        c.id, c.name, c.family, c.package_type, c.nominal_value, c.electrical_supply, 
+        c.unit_cost, c.available_quantity, c.required_quantity, s.cabinet, 
+        s.shelf, s.drawer,
+        (SELECT i.image_url
+         FROM images i
+         WHERE i.component_id = c.id
+         LIMIT 1) AS image 
       FROM components c
       JOIN storage s ON s.component_id = c.id
-      WHERE (c.name LIKE ? OR c.family LIKE ? OR c.package_type LIKE ?
+      WHERE (c.name LIKE ? OR c.family LIKE ? OR c.package_type LIKE ? 
              OR c.nominal_value LIKE ? OR c.electrical_supply LIKE ? 
              OR c.suppliers_name LIKE ? OR s.cabinet LIKE ? OR s.shelf LIKE ? 
              OR s.drawer LIKE ?)`;
@@ -91,19 +91,21 @@ export const getComponents = async (req: Request, res: Response) => {
       params.push(`%${drawer}%`);
     }
 
-    // Add pagination
-    query += ` LIMIT ? OFFSET ?`;
-    params.push(pageSize, offset);
+    // Add pagination if pageSize is provided
+    if (pageSize) {
+      query += ` LIMIT ? OFFSET ?`;
+      params.push(pageSize, offset);
+    }
 
     // Execute the query
     const components = await conn.query(query, params);
 
-    res.send({ components });
+    res.send(components);
   } catch (error) {
     console.log(error);
     res
       .status(500)
-      .send({ "An error occurred while fetching components:": error });
+      .send({ error: "An error occurred while fetching components:" });
   } finally {
     if (conn) {
       try {
@@ -473,5 +475,31 @@ export const addStorage = async (
     res.status(500).send(status);
   } finally {
     if (conn) conn.release();
+  }
+};
+
+export const test = async (req: Request, res: Response) => {
+  let conn;
+
+  try {
+    conn = await createConnection();
+
+    // Execute the query
+    const components = await conn.query(`SELECT * FROM components`);
+
+    res.send(components);
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .send({ error: "An error occurred while fetching components." });
+  } finally {
+    if (conn) {
+      try {
+        conn.release();
+      } catch (error) {
+        console.error("An error occurred while fetching components:", error);
+      }
+    }
   }
 };
