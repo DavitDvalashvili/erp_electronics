@@ -7,7 +7,8 @@ import axios from "axios";
 import Loading from "../Loading";
 import ServerError from "../ServerError";
 import { IoSearch } from "react-icons/io5";
-import Pagination from "../../components/Pagination";
+import Pagination from "../../components/component/Pagination";
+import FilterBox from "../../components/component/FilterBox";
 
 const defaultQuery = {
   name: "",
@@ -21,7 +22,7 @@ const defaultQuery = {
   drawer: "",
   searchTerm: "",
   page: 1,
-  pageSize: 4,
+  pageSize: 10,
 };
 
 const Components = () => {
@@ -82,7 +83,10 @@ const Components = () => {
           <span>ფილტრის გამოჩენა</span>
         </button>
       </div>
-      <Pagination searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      <div className="mt-[2rem]">
+        <Pagination searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      </div>
+      <FilterBox searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       <div className="flex justify-start gap-2 flex-wrap">
         {components?.map((elem) => <div key={elem.id}>{elem.name}</div>)}
       </div>

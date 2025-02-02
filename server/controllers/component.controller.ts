@@ -398,21 +398,55 @@ export const getFilterTerms = async (req: Request, res: Response) => {
   let conn;
   try {
     conn = await createConnection();
+
     let query = `SELECT 
     c.name, c.family, c.package_type, c.nominal_value, c.electrical_supply, 
-    c.unit_cost, c.available_quantity, c.required_quantity, s.cabinet, 
-    s.drawer, s.shelf FROM components c
+    s.cabinet, s.drawer, s.shelf FROM components c
     JOIN storage s ON c.id = s.component_id`;
 
     const filterTerms = await conn.query(query);
 
     if (filterTerms.length == 0) {
-      res
-        .status(404)
-        .send({ error: "An error occurred while fetching filter terms" });
+      res.status(404).send({ error: "No filter terms found" });
     }
 
-    res.send(filterTerms);
+    console.log(filterTerms);
+
+    const uniqueNames = [...new Set(filterTerms.map((item: any) => item.name))];
+    const uniqueFamilies = [
+      ...new Set(filterTerms.map((item: any) => item.family)),
+    ];
+    const uniquePackageTypes = [
+      ...new Set(filterTerms.map((item: any) => item.package_type)),
+    ];
+    const uniqueNominalValues = [
+      ...new Set(filterTerms.map((item: any) => item.nominal_value)),
+    ];
+    const uniqueElectronicSupplies = [
+      ...new Set(filterTerms.map((item: any) => item.electrical_supply)),
+    ];
+    const uniqueCabinets = [
+      ...new Set(filterTerms.map((item: any) => item.cabinet)),
+    ];
+    const uniqueShelves = [
+      ...new Set(filterTerms.map((item: any) => item.shelf)),
+    ];
+    const uniqueDrawers = [
+      ...new Set(filterTerms.map((item: any) => item.drawer)),
+    ];
+
+    const responseData = {
+      name: uniqueNames,
+      family: uniqueFamilies,
+      nominalValue: uniqueNominalValues,
+      packageType: uniquePackageTypes,
+      electronicSupply: uniqueElectronicSupplies,
+      cabinet: uniqueCabinets,
+      shelf: uniqueShelves,
+      drawer: uniqueDrawers,
+    };
+
+    res.send(responseData);
   } catch (err) {
     console.log(err);
     res
