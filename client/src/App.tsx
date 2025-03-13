@@ -24,7 +24,7 @@ type UseElectronics = {
 };
 
 export const useElectronics = create<UseElectronics>((set) => ({
-  API_URL: "http://192.168.1.26:4000",
+  API_URL: "http://localhost:4000",
   appStatus: "Loading",
   setAppStatus: (appStatus: AppStatus) => set({ appStatus }),
 }));

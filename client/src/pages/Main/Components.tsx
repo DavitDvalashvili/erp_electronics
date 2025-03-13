@@ -33,7 +33,10 @@ const Components = () => {
   const getComponents = async () => {
     setAppStatus("Loading");
     await axios
-      .get(`${API_URL}/getComponents`)
+      .get(
+        `${API_URL}/getComponents?name=${searchQuery.name}&family=${searchQuery.family}&package_type=${searchQuery.package_type}&nominal_value=${searchQuery.nominal_value}&electrical_supply=${searchQuery.electrical_supply}&suppliers_name=${searchQuery.suppliers_name}&cabinet=${searchQuery.cabinet}&shelf=${searchQuery.shelf}&drawer=${searchQuery.drawer}&searchTerm=${searchQuery.searchTerm}&page=${searchQuery.page}&pageSize=${searchQuery.pageSize}
+        `
+      )
       .then((res) => {
         if (res.status == 200) {
           setComponents(res.data);
@@ -48,7 +51,7 @@ const Components = () => {
 
   useEffect(() => {
     getComponents();
-  }, []);
+  }, [searchQuery]);
 
   if (appStatus === "Loading") return <Loading />;
   if (appStatus === "Server Error") return <ServerError />;
@@ -87,8 +90,15 @@ const Components = () => {
         <Pagination searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       </div>
       <FilterBox searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-      <div className="flex justify-start gap-2 flex-wrap">
-        {components?.map((elem) => <div key={elem.id}>{elem.name}</div>)}
+      <div className="flex justify-start gap-2 flex-wrap ">
+        {components?.map((elem) => (
+          <div key={elem.id} className="bg-red-700 flex flex-col gap-8">
+            <div>{elem.name}</div>
+            <div>{elem.available_quantity}</div>
+            <div>{elem.family}</div>
+            <div>{elem.package_type}</div>
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -63,11 +63,11 @@ const FilterBox = ({ searchQuery, setSearchQuery }: FilterBoxProps) => {
   };
 
   return (
-    <div className="flex items-center gap-8 flex-wrap ">
+    <div className="grid grid-cols-4 gap-[1rem] bg-red-800 mt-8 ">
       {filterFields.map((field) => (
         <Select
           key={field.key}
-          className="basic-single w-1/5"
+          className="basic-single w-full"
           classNamePrefix="select"
           isClearable
           isSearchable
