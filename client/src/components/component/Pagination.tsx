@@ -13,6 +13,8 @@ const Pagination = ({ searchQuery, setSearchQuery }: pagination) => {
   const { API_URL } = useElectronics();
   const [dataLength, setDataLength] = useState<number>(0);
 
+  console.log(searchQuery);
+
   const getAllComponents = async () => {
     await axios
       .get(`${API_URL}/getComponents`)
@@ -38,8 +40,8 @@ const Pagination = ({ searchQuery, setSearchQuery }: pagination) => {
       <div className="flex gap-4">
         <div
           className="w-[4rem] h-[4rem] rounded-default border-[0.05rem] border-bgColor 
-      text-[2rem] font-medium  flex justify-center items-center 
-      cursor-pointer hover:bg-bgColor hover:text-white"
+          text-[2rem] font-medium  flex justify-center items-center 
+          cursor-pointer hover:bg-bgColor hover:text-white"
           onClick={() => {
             if (searchQuery.page > 1) {
               setSearchQuery({ ...searchQuery, page: searchQuery.page - 1 });
@@ -100,6 +102,7 @@ const Pagination = ({ searchQuery, setSearchQuery }: pagination) => {
       <select
         name="pageSize"
         id="pageSize"
+        value={searchQuery.pageSize}
         onChange={(e) => {
           setSearchQuery({
             ...searchQuery,
@@ -110,12 +113,10 @@ const Pagination = ({ searchQuery, setSearchQuery }: pagination) => {
         className="w-[5rem] h-[4rem] rounded-default border-[0.05rem] border-bgColor 
              text-[1.8rem] font-medium focus:outline-none cursor-pointer bg-transparent"
       >
-        <option value="10" defaultChecked>
-          10
-        </option>
-        <option value="20">20</option>
-        <option value="30">30</option>
-        <option value="50">50</option>
+        <option value={4}>4</option>
+        <option value={8}>8</option>
+        <option value={12}>14</option>
+        <option value={15}>15</option>
       </select>
     </div>
   );

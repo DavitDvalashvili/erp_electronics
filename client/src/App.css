@@ -8,11 +8,11 @@ html {
   font-feature-settings: "case" on;
 }
 
-html::-webkit-scrollbar {
+*::-webkit-scrollbar {
   width: 5px;
 }
 
-html::-webkit-scrollbar-thumb {
+*::-webkit-scrollbar-thumb {
   background-color: gray;
 }
 

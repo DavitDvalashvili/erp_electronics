@@ -16,6 +16,7 @@ export default {
         errorRed: "#FF0000",
         placeholder: "#898A8A",
         popupBackground: "rgba(0, 0, 0, 0.59)",
+        green: "#15CD5C",
       },
       borderRadius: {
         default: "10px",
