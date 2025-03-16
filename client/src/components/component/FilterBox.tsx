@@ -63,7 +63,7 @@ const FilterBox = ({ searchQuery, setSearchQuery }: FilterBoxProps) => {
   };
 
   return (
-    <div className="grid grid-cols-4 gap-[1rem] mt-8 ">
+    <div className="grid grid-cols-4 gap-[1rem] mt-8 text-[1.4rem] ">
       {filterFields.map((field) => (
         <Select
           key={field.key}

@@ -20,7 +20,6 @@ const Pagination = ({ searchQuery, setSearchQuery }: pagination) => {
       .get(`${API_URL}/getComponents`)
       .then((res) => {
         if (res.status == 200) {
-          console.log(res.data);
           setDataLength(res.data.length);
         }
       })
@@ -32,8 +31,6 @@ const Pagination = ({ searchQuery, setSearchQuery }: pagination) => {
   useEffect(() => {
     getAllComponents();
   }, []);
-
-  console.log(dataLength);
 
   return (
     <div className="flex items-center justify-start gap-8">
@@ -70,7 +67,9 @@ const Pagination = ({ searchQuery, setSearchQuery }: pagination) => {
             <div
               key={page}
               onClick={() => {
-                setSearchQuery({ ...searchQuery, page });
+                if (searchQuery.page !== page) {
+                  setSearchQuery({ ...searchQuery, page });
+                }
               }}
               className={`w-[4rem] h-[4rem] rounded-default border-[0.05rem] border-bgColor 
              text-[1.6rem] font-medium  justify-center items-center 

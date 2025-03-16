@@ -1,7 +1,6 @@
 import { CgComponents } from "react-icons/cg";
 import { PiDeviceMobileSpeakerFill } from "react-icons/pi";
 import { IoMdNotifications } from "react-icons/io";
-import { RiTodoFill } from "react-icons/ri";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -19,15 +18,15 @@ const NavigationLayout = () => {
   }, [pathname]);
 
   return (
-    <div
+    <aside
       className=" h-screen min-w-[28rem] xl:min-w-[38rem] flex flex-col justify-start items-center py-[4rem] gap-[8rem]
-      font-firago font-feature bg-white"
+      font-firago font-feature bg-white "
     >
       <div>
         <img
           src="/Logical_systems.png"
           alt="logical_system_company"
-          className="h-[12rem] w-[15rem]"
+          className="h-[12rem] w-[15rem] rounded-default shadow-lg"
         />
       </div>
       <nav className="w-full">
@@ -56,17 +55,9 @@ const NavigationLayout = () => {
               <span>შეტყობინებები</span>
             </li>
           </Link>
-          <Link to="/todo">
-            <li
-              className={`flex gap-8 py-4 rounded-default px-[3rem] xl:px-[6rem] ${activePage === "todo" ? "bg-bgColor text-white" : "text-textColor"}`}
-            >
-              <RiTodoFill className="w-[3rem] h-[3rem]" />
-              <span>საყიდლები</span>
-            </li>
-          </Link>
         </ul>
       </nav>
-    </div>
+    </aside>
   );
 };
 
