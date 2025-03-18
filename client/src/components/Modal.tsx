@@ -10,7 +10,6 @@ export const Modal = ({ setShowModal, children, title }: Props) => {
             setShowModal(false);
           }}
         >
-          {" "}
           <h4>{title}</h4>
           <MdOutlineCancel className="w-[2.4rem] h-[2.4rem] text-textColor cursor-pointer hover:text-errorRed transition duration-300" />
         </div>

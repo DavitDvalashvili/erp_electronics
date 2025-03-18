@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { createConnection } from "../db/database";
-import { ResponseStatus } from "../@types/type";
-import { ComponentInfo, StorageInfo } from "../@types/global";
+import { ResponseStatus } from "../types/type";
+import { Component, Storage, FilterTermsComponent } from "../types/type";
+import { error } from "console";
 
 export const getComponents = async (req: Request, res: Response) => {
   let conn;
@@ -15,7 +16,6 @@ export const getComponents = async (req: Request, res: Response) => {
   const cabinet = (req.query.cabinet as string) || "";
   const shelf = (req.query.shelf as string) || "";
   const drawer = (req.query.drawer as string) || "";
-
   const searchTerm = (req.query.searchTerm as string) || "";
   const page = parseInt(req.query.page as string) || 1;
   const pageSize = parseInt(req.query.pageSize as string);
@@ -26,20 +26,31 @@ export const getComponents = async (req: Request, res: Response) => {
 
     // Base query
     let query = `
-      SELECT 
-        c.id, c.name, c.family, c.package_type, c.nominal_value, c.electrical_supply, 
-        c.unit_cost, c.available_quantity, c.required_quantity, s.cabinet, 
-        s.shelf, s.drawer,
-        (SELECT i.image_url
-         FROM images i
-         WHERE i.component_id = c.id
-         LIMIT 1) AS image 
-      FROM components c
-      JOIN storage s ON s.component_id = c.id
-      WHERE (c.name LIKE ? OR c.family LIKE ? OR c.package_type LIKE ? 
-             OR c.nominal_value LIKE ? OR c.electrical_supply LIKE ? 
-             OR c.suppliers_name LIKE ? OR s.cabinet LIKE ? OR s.shelf LIKE ? 
-             OR s.drawer LIKE ?)`;
+                  SELECT 
+              c.*, s.cabinet, s.shelf, s.drawer,
+              COALESCE(
+                JSON_ARRAYAGG(
+                  JSON_OBJECT(
+                    'image_url', i.image_url,
+                    'image_id', i.id
+                  )
+                ), 
+                JSON_ARRAY()
+              ) AS images
+            FROM 
+              components c
+            JOIN 
+              storage s ON s.component_id = c.id
+            LEFT JOIN 
+              images i ON i.component_id = c.id
+            WHERE 
+              (c.name LIKE ? OR c.family LIKE ? OR c.package_type LIKE ? 
+              OR c.nominal_value LIKE ? OR c.electrical_supply LIKE ? 
+              OR c.suppliers_name LIKE ? OR s.cabinet LIKE ? OR s.shelf LIKE ? 
+              OR s.drawer LIKE ?)
+            GROUP BY 
+              c.id, s.cabinet, s.shelf, s.drawer
+            ORDER BY C.id DESC`;
 
     const params: (string | number)[] = [
       `%${searchTerm}%`,
@@ -98,14 +109,14 @@ export const getComponents = async (req: Request, res: Response) => {
     }
 
     // Execute the query
-    const components = await conn.query(query, params);
+    const components: Component[] = await conn.query(query, params);
 
     res.send(components);
   } catch (error) {
     console.log(error);
     res
       .status(500)
-      .send({ error: "An error occurred while fetching components:" });
+      .send({ error: "An error occurred while fetching components" });
   } finally {
     if (conn) {
       try {
@@ -119,7 +130,7 @@ export const getComponents = async (req: Request, res: Response) => {
 
 export const getComponent = async (req: Request, res: Response) => {
   let conn;
-  const id = req.params.id as string;
+  const id = req.params.id as string | number;
 
   try {
     conn = await createConnection();
@@ -130,12 +141,14 @@ export const getComponent = async (req: Request, res: Response) => {
         s.cabinet, 
         s.drawer, 
         s.shelf,
-        JSON_ARRAYAGG(
-          JSON_OBJECT(
+        COALESCE(
+      JSON_ARRAYAGG(
+        JSON_OBJECT(
             'image_url', i.image_url,
             'image_id', i.id
-          )
-        ) AS images
+          )), 
+        JSON_ARRAY()
+      ) AS images
       FROM components c
       JOIN storage s ON s.component_id = c.id
       LEFT JOIN images i ON i.component_id = c.id
@@ -143,14 +156,14 @@ export const getComponent = async (req: Request, res: Response) => {
       GROUP BY c.id, s.cabinet, s.drawer, s.shelf
     `;
 
-    const component = await conn.query(query, [id]);
+    const component: Component = await conn.query(query, [id]);
 
     res.send(component);
   } catch (err) {
     console.log(err);
     res
       .status(500)
-      .send({ error: "An error occurred while fetching component." });
+      .send({ error: "An error occurred while fetching component" });
   } finally {
     if (conn) conn.release();
   }
@@ -161,6 +174,7 @@ export const addComponent = async (
   res: Response
 ): Promise<void> => {
   let conn;
+
   let status: ResponseStatus;
 
   const {
@@ -178,7 +192,10 @@ export const addComponent = async (
     suppliers_name,
     suppliers_contact_details,
     receipt_date,
-  } = <ComponentInfo>req.body;
+    cabinet,
+    shelf,
+    drawer,
+  } = <Component>req.body;
 
   const componentInfo = [
     family,
@@ -201,21 +218,11 @@ export const addComponent = async (
     conn = await createConnection();
 
     if (!name || !available_quantity || !required_quantity) {
-      res.status(404).send({ message: "Empty required fields" });
-    }
-
-    let existingComponent = await conn.query(
-      `SELECT * FROM components c WHERE c.name = ? `,
-      name
-    );
-
-    if (existingComponent.length > 0) {
       status = {
-        status: "insert_exists",
-        message: "Component already exists",
+        status: "insert_error",
+        message: "შეავსეთ ყველა სავალდებულო ველი",
       };
-      res.status(409).json(status);
-      return;
+      res.send(status);
     }
 
     const insertQuery = `
@@ -226,30 +233,40 @@ export const addComponent = async (
    VALUES 
     (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) `;
 
-    await conn
-      .query(insertQuery, [...componentInfo])
-      .then(() => {
-        status = {
-          status: "inserted",
-          message: "Component inserted successfully",
-        };
-        res.send(status);
-      })
-      .catch((err) => {
-        status = {
-          status: "insert_error",
-          message: "An error occurred while adding component.",
-        };
-        res.send(status);
-        console.log(err);
-      });
+    const component = await conn.query(insertQuery, [...componentInfo]);
+
+    if (component.affectedRows > 0) {
+      await conn
+        .query(
+          `INSERT INTO storage (cabinet, shelf, drawer, component_id) VALUES (?, ?, ?, ?)`,
+          [cabinet, shelf, drawer, component.insertId]
+        )
+        .then((result) => {
+          status = {
+            status: "inserted",
+            message: "კომპონენტი წარმატებით დაემატა",
+            insert_id: Number(component.insertId),
+          };
+          res.send(status);
+        })
+        .catch((err) => {
+          status = {
+            status: "insert_error",
+            message: "კომპონენტი ვერ დაემატა",
+          };
+          res.send(status);
+          console.log(err);
+        });
+    } else {
+      status = {
+        status: "insert_error",
+        message: "კომპონენტი ვერ დაემატა",
+      };
+      res.send(status);
+    }
   } catch (err) {
     console.log(err);
-    status = {
-      status: "insert_error",
-      message: "An error occurred while adding component.",
-    };
-    res.status(500).send(status);
+    res.status(500).send(error);
   } finally {
     if (conn) conn.release();
   }
@@ -257,7 +274,7 @@ export const addComponent = async (
 
 export const updateComponent = async (req: Request, res: Response) => {
   let conn;
-  let id = req.params.id as string;
+  let id = req.params.id as string | number;
 
   let status: ResponseStatus;
 
@@ -276,7 +293,10 @@ export const updateComponent = async (req: Request, res: Response) => {
     suppliers_name,
     suppliers_contact_details,
     receipt_date,
-  } = <ComponentInfo>req.body;
+    cabinet,
+    shelf,
+    drawer,
+  } = <Component>req.body;
 
   const componentInfo = [
     family,
@@ -298,20 +318,6 @@ export const updateComponent = async (req: Request, res: Response) => {
   try {
     conn = await createConnection();
 
-    let existingComponent = await conn.query(
-      `SELECT * FROM components WHERE name = ? AND id != ?`,
-      [name, id]
-    );
-
-    if (existingComponent.length > 0) {
-      status = {
-        status: "update_exists",
-        message: "Component already exists",
-      };
-      res.status(409).json(status);
-      return;
-    }
-
     const updateQuery = `
       UPDATE components
       SET 
@@ -331,30 +337,43 @@ export const updateComponent = async (req: Request, res: Response) => {
         receipt_date = ?
       WHERE id = ?`;
 
-    await conn
-      .query(updateQuery, [...componentInfo, id])
-      .then(() => {
-        status = {
-          status: "updated",
-          message: "Component updated successfully",
-        };
-        res.send(status);
-      })
-      .catch((err) => {
-        status = {
-          status: "update_error",
-          message: "An error occurred while updating component.",
-        };
-        res.send(status);
-        console.log(err);
-      });
+    const updatedComponent = await conn.query(updateQuery, [
+      ...componentInfo,
+      id,
+    ]);
+
+    console.log(updatedComponent);
+
+    if (updatedComponent.affectedRows > 0) {
+      await conn
+        .query(
+          `UPDATE storage SET cabinet = ? , shelf = ? , drawer = ? WHERE component_id = ?`,
+          [cabinet, shelf, drawer, id]
+        )
+        .then((result) => {
+          status = {
+            status: "updated",
+            message: "კომპონენტი წარმატებით განახლდა",
+          };
+          res.send(status);
+        })
+        .catch((err) => {
+          status = {
+            status: "update_error",
+            message: "კომპონენტი ვერ განახლდა",
+          };
+          res.send(status);
+        });
+    } else {
+      status = {
+        status: "update_error",
+        message: "კომპონენტი ვერ განახლდა",
+      };
+      res.send(status);
+    }
   } catch (err) {
     console.log(err);
-    status = {
-      status: "update_error",
-      message: "An error occurred while updating component.",
-    };
-    res.status(500).send(status);
+    res.status(500).send(error);
   } finally {
     if (conn) conn.release();
   }
@@ -373,21 +392,21 @@ export const deleteComponent = async (req: Request, res: Response) => {
     const result = await conn.query(query, [id]);
 
     if (result.affectedRows === 0) {
-      res.status(404).send({ message: "component not found" });
+      status = {
+        status: "delete_error",
+        message: "კომპონენტი ვერ წაიშალა",
+      };
+      res.send(status);
       return;
     } else {
       status = {
         status: "deleted",
-        message: "Component deleted successfully",
+        message: "კომპონენტი წაიშალა წარმატებით",
       };
       res.send(status);
     }
   } catch (err) {
-    status = {
-      status: "delete_error",
-      message: "An error occurred while deleting component.",
-    };
-    res.status(500).send(status);
+    res.status(500).send(error);
     console.log(err);
   } finally {
     if (conn) await conn.release();
@@ -400,53 +419,26 @@ export const getFilterTerms = async (req: Request, res: Response) => {
     conn = await createConnection();
 
     let query = `SELECT 
-    c.name, c.family, c.package_type, c.nominal_value, c.electrical_supply, 
-    s.cabinet, s.drawer, s.shelf FROM components c
-    JOIN storage s ON c.id = s.component_id`;
+        JSON_ARRAYAGG(c.name) AS names,
+        JSON_ARRAYAGG(c.family) AS families,
+        JSON_ARRAYAGG(c.package_type) AS package_types,
+        JSON_ARRAYAGG(c.nominal_value) AS nominal_values,
+        JSON_ARRAYAGG(c.electrical_supply) AS electrical_supplies,
+        JSON_ARRAYAGG(s.cabinet) AS cabinets,
+        JSON_ARRAYAGG(s.drawer) AS drawers,
+        JSON_ARRAYAGG(s.shelf) AS shelves
+      FROM 
+        components c
+      JOIN 
+        storage s ON c.id = s.component_id`;
 
-    const filterTerms = await conn.query(query);
+    const filterTerms: FilterTermsComponent[] = await conn.query(query);
 
     if (filterTerms.length == 0) {
       res.status(404).send({ error: "No filter terms found" });
     }
 
-    console.log(filterTerms);
-
-    const uniqueNames = [...new Set(filterTerms.map((item: any) => item.name))];
-    const uniqueFamilies = [
-      ...new Set(filterTerms.map((item: any) => item.family)),
-    ];
-    const uniquePackageTypes = [
-      ...new Set(filterTerms.map((item: any) => item.package_type)),
-    ];
-    const uniqueNominalValues = [
-      ...new Set(filterTerms.map((item: any) => item.nominal_value)),
-    ];
-    const uniqueElectronicSupplies = [
-      ...new Set(filterTerms.map((item: any) => item.electrical_supply)),
-    ];
-    const uniqueCabinets = [
-      ...new Set(filterTerms.map((item: any) => item.cabinet)),
-    ];
-    const uniqueShelves = [
-      ...new Set(filterTerms.map((item: any) => item.shelf)),
-    ];
-    const uniqueDrawers = [
-      ...new Set(filterTerms.map((item: any) => item.drawer)),
-    ];
-
-    const responseData = {
-      name: uniqueNames,
-      family: uniqueFamilies,
-      nominalValue: uniqueNominalValues,
-      packageType: uniquePackageTypes,
-      electronicSupply: uniqueElectronicSupplies,
-      cabinet: uniqueCabinets,
-      shelf: uniqueShelves,
-      drawer: uniqueDrawers,
-    };
-
-    res.send(responseData);
+    res.send(filterTerms[0]);
   } catch (err) {
     console.log(err);
     res
@@ -454,86 +446,5 @@ export const getFilterTerms = async (req: Request, res: Response) => {
       .send({ error: "An error occurred while fetching filter terms" });
   } finally {
     if (conn) conn.release();
-  }
-};
-
-export const addStorage = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  const componentId = req.params.id as String;
-  let conn;
-  let status: ResponseStatus;
-
-  const { cabinet, shelf, drawer } = <StorageInfo>req.body;
-
-  let storageInfo = [cabinet, shelf, drawer];
-
-  try {
-    conn = await createConnection();
-
-    let existingComponent = await conn.query(
-      `SELECT * FROM components WHERE id = ?`,
-      [componentId]
-    );
-    if (existingComponent.length == 0) {
-      res.status(404).send({ message: "Component not found" });
-      return;
-    }
-
-    let insertQuery = `INSERT INTO storage (cabinet, shelf, drawer, component_id) VALUES (?, ?, ?, ?)`;
-
-    await conn
-      .query(insertQuery, [...storageInfo, componentId])
-      .then(() => {
-        status = {
-          status: "inserted",
-          message: "Storage inserted successfully",
-        };
-        res.send(status);
-      })
-      .catch((err) => {
-        status = {
-          status: "insert_error",
-          message: "An error occurred while adding storage.",
-        };
-        res.send(status);
-        console.log(err);
-      });
-  } catch (error) {
-    console.log(error);
-    status = {
-      status: "insert_error",
-      message: "An error occurred while adding storage.",
-    };
-    res.status(500).send(status);
-  } finally {
-    if (conn) conn.release();
-  }
-};
-
-export const test = async (req: Request, res: Response) => {
-  let conn;
-
-  try {
-    conn = await createConnection();
-
-    // Execute the query
-    const components = await conn.query(`SELECT * FROM components`);
-
-    res.send(components);
-  } catch (error) {
-    console.log(error);
-    res
-      .status(500)
-      .send({ error: "An error occurred while fetching components." });
-  } finally {
-    if (conn) {
-      try {
-        conn.release();
-      } catch (error) {
-        console.error("An error occurred while fetching components:", error);
-      }
-    }
   }
 };

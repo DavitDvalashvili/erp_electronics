@@ -1,4 +1,4 @@
-type ResponseStatus = {
+export type ResponseStatus = {
   status:
     | "inserted"
     | "insert_exists"
@@ -12,33 +12,12 @@ type ResponseStatus = {
   insert_id?: number | string;
 };
 
-interface Props {
-  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
-  title: string;
-  children: React.ReactNode;
-}
-
-type QueryComponent = {
-  name: string;
-  family: string;
-  package_type: string;
-  nominal_value: string;
-  electrical_supply: string;
-  suppliers_name: string;
-  cabinet: string;
-  shelf: string;
-  drawer: string;
-  searchTerm: string;
-  page: number;
-  pageSize: number;
+export type Image = {
+  image_id: number;
+  image_url: string;
 };
 
-type Image = {
-  image_id: number | null;
-  image_url: string | null;
-};
-
-type Component = {
+export type Component = {
   id?: string | number;
   family: string;
   name: string;
@@ -59,4 +38,33 @@ type Component = {
   drawer: string;
   shelf: string;
   images: Image[];
+};
+
+export type Storage = {
+  id?: string | number;
+  component_id?: string | number;
+  device_id?: string | number;
+  cabinet: string;
+  shelf: string;
+  drawer: string;
+};
+
+export type Device = {
+  name: string;
+  purpose: string;
+  electrical_supply: string;
+  size: string;
+  available_quantity: string;
+  unit_cost: string;
+};
+
+export type FilterTermsComponent = {
+  names: string[];
+  families: string[];
+  package_types: string[];
+  nominal_values: string[];
+  electrical_supplies: string[];
+  cabinets: string[];
+  drawers: string[];
+  shelves: string[];
 };

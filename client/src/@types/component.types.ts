@@ -1,4 +1,4 @@
-export type filterTerms = {
+export type FilterTerm = {
   name: string;
   family: string;
   nominal_value: string;
@@ -9,13 +9,13 @@ export type filterTerms = {
   shelf: string;
 };
 
-export type filterTermsComponent = {
-  cabinet: string[];
-  drawer: string[];
-  electronicSupply: string[];
-  family: string[];
-  name: string[];
-  nominalValue: string[];
-  packageType: string[];
-  shelf: string[];
+export type FilterTerms = {
+  names: string[];
+  families: string[];
+  package_types: string[];
+  nominal_values: string[];
+  electrical_supplies: string[];
+  cabinets: string[];
+  drawers: string[];
+  shelves: string[];
 };

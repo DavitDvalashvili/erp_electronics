@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { createConnection } from "../db/database";
-import { DeviceInfo } from "../@types/global";
-import { ResponseStatus } from "../@types/type";
+import { Device } from "../types/type";
+import { ResponseStatus } from "../types/type";
 
 export const getDevices = async (req: Request, res: Response) => {
   let conn;
@@ -125,7 +125,7 @@ export const addDevice = async (req: Request, res: Response): Promise<void> => {
     size,
     available_quantity,
     unit_cost,
-  } = <DeviceInfo>req.body;
+  } = <Device>req.body;
 
   const deviceInfo = [
     name,
@@ -206,7 +206,7 @@ export const updateDevice = async (req: Request, res: Response) => {
     size,
     available_quantity,
     unit_cost,
-  } = <DeviceInfo>req.body;
+  } = <Device>req.body;
 
   const deviceInfo = [
     name,

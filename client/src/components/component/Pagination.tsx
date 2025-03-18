@@ -13,8 +13,6 @@ const Pagination = ({ searchQuery, setSearchQuery }: pagination) => {
   const { API_URL } = useElectronics();
   const [dataLength, setDataLength] = useState<number>(0);
 
-  console.log(searchQuery);
-
   const getAllComponents = async () => {
     await axios
       .get(`${API_URL}/getComponents`)

@@ -2,40 +2,40 @@ import axios from "axios";
 import { useElectronics } from "../../App";
 import { useEffect, useState } from "react";
 import Select from "react-select";
-import { filterTerms } from "../../@types/component.types";
-import { filterTermsComponent } from "../../@types/component.types";
+import { FilterTerm } from "../../@types/component.types";
+import { FilterTerms } from "../../@types/component.types";
 
 type FilterBoxProps = {
   searchQuery: QueryComponent;
   setSearchQuery: (query: QueryComponent) => void;
 };
 
-const defaultFilterTerms: filterTermsComponent = {
-  cabinet: [],
-  drawer: [],
-  electronicSupply: [],
-  family: [],
-  name: [],
-  nominalValue: [],
-  packageType: [],
-  shelf: [],
+const defaultFilterTerms: FilterTerms = {
+  cabinets: [],
+  drawers: [],
+  electrical_supplies: [],
+  families: [],
+  names: [],
+  nominal_values: [],
+  package_types: [],
+  shelves: [],
 };
 
 const filterFields = [
-  { key: "name", placeholder: "დასახელება..." },
-  { key: "family", placeholder: "ოჯახის ტიპი..." },
-  { key: "nominalValue", placeholder: "ნომინალური ღირებულება..." },
-  { key: "packageType", placeholder: "პაკეტის ტიპი..." },
-  { key: "electronicSupply", placeholder: "ელექტრონული კვება..." },
-  { key: "cabinet", placeholder: "კარადა..." },
-  { key: "drawer", placeholder: "უჯრა..." },
-  { key: "shelf", placeholder: "თარო..." },
+  { key: "names", placeholder: "დასახელება..." },
+  { key: "families", placeholder: "ოჯახის ტიპი..." },
+  { key: "nominal_values", placeholder: "ნომინალური ღირებულება..." },
+  { key: "package_types", placeholder: "პაკეტის ტიპი..." },
+  { key: "electrical_supplies", placeholder: "ელექტრონული კვება..." },
+  { key: "cabinets", placeholder: "კარადა..." },
+  { key: "drawers", placeholder: "უჯრა..." },
+  { key: "shelves", placeholder: "თარო..." },
 ];
 
 const FilterBox = ({ searchQuery, setSearchQuery }: FilterBoxProps) => {
   const { API_URL } = useElectronics();
   const [filterTerms, setFilterTerms] =
-    useState<filterTermsComponent>(defaultFilterTerms);
+    useState<FilterTerms>(defaultFilterTerms);
 
   const getFilterTerms = async () => {
     try {
@@ -72,22 +72,22 @@ const FilterBox = ({ searchQuery, setSearchQuery }: FilterBoxProps) => {
           isClearable
           isSearchable
           name={field.key}
-          options={filterTerms[field.key as keyof filterTermsComponent].map(
-            (value) => ({
+          options={[...new Set(filterTerms[field.key as keyof FilterTerms])]
+            .filter((elem) => elem !== "")
+            .map((value) => ({
               label: value,
               value,
-            })
-          )}
+            }))}
           value={
-            searchQuery[field.key as keyof filterTerms]
+            searchQuery[field.key as keyof FilterTerm]
               ? {
-                  label: searchQuery[field.key as keyof filterTerms],
-                  value: searchQuery[field.key as keyof filterTerms],
+                  label: searchQuery[field.key as keyof FilterTerm],
+                  value: searchQuery[field.key as keyof FilterTerm],
                 }
               : null
           }
           onChange={(selectedOption) =>
-            handleChange(field.key as keyof filterTerms, selectedOption)
+            handleChange(field.key as keyof FilterTerm, selectedOption)
           }
           placeholder={field.placeholder}
         />

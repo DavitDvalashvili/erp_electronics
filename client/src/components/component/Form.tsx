@@ -1,8 +1,12 @@
-import { defaultComponent } from "../../pages/Main/Component";
 import { useState } from "react";
 
-const Form = () => {
-  const [formData, setFormData] = useState<Component>(defaultComponent);
+type Form = {
+  formData: Component;
+  setFormData: (value: React.SetStateAction<Component>) => void;
+  submitFunction: () => void;
+};
+
+const Form = ({ setFormData, formData, submitFunction }: Form) => {
   const [focusDate, setFocusDate] = useState<boolean>(false);
   const [validationsMessage, setValidationsMessage] = useState<string | null>(
     null
@@ -17,6 +21,8 @@ const Form = () => {
     ) {
       setValidationsMessage("გთხოვთ შეავსოთ ყველა სავალდებულო * ველი");
       return;
+    } else {
+      submitFunction();
     }
   };
 
@@ -224,8 +230,7 @@ const Form = () => {
       <button
         type="submit"
         className="text-[1.6rem] rounded-default flex justify-center items-center
-                            bg-green text-white font-bold px-[3rem] py-3 mx-auto"
-        onClick={() => {}}
+         bg-green text-white font-bold px-[3rem] py-3 mx-auto"
       >
         დამატება
       </button>

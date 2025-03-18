@@ -5,8 +5,6 @@ import {
   updateComponent,
   getFilterTerms,
   deleteComponent,
-  addStorage,
-  test,
 } from "../controllers/component.controller";
 import { Router } from "express";
 
@@ -18,7 +16,5 @@ componentRouter.post("/addComponent", addComponent);
 componentRouter.post("/updateComponent/:id", updateComponent);
 componentRouter.delete("/deleteComponent/:id", deleteComponent);
 componentRouter.get("/component/getFilterTerms", getFilterTerms);
-componentRouter.post("/addStorage/:id", addStorage);
-componentRouter.get("/test", test);
 
 export default componentRouter;

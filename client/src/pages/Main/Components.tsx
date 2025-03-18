@@ -12,8 +12,11 @@ import { FaSortAmountUpAlt } from "react-icons/fa";
 import { ImDrawer } from "react-icons/im";
 import SearchBox from "../../components/component/SearchBox";
 import { Link } from "react-router-dom";
-import { Modal } from "../../components/Modal";
-import Form from "../../components/component/Form";
+import AddComponent from "../../components/component/AddComponent";
+import UpdateQuantity from "../../components/component/UpdateQuantity";
+import { defaultComponent } from "./Component";
+import ResultNotFound from "../../components/ResultNotFound";
+import UpdateStorage from "../../components/component/UpdateStorage";
 
 const defaultQuery: QueryComponent = {
   name: "",
@@ -32,10 +35,14 @@ const defaultQuery: QueryComponent = {
 
 const Components = () => {
   const { API_URL, appStatus, setAppStatus } = useElectronics();
-  const [components, setComponents] = useState<Components[] | null>(null);
+  const [components, setComponents] = useState<Component[]>([]);
   const [searchQuery, setSearchQuery] = useState<QueryComponent>(defaultQuery);
   const [showFilter, setShowFilter] = useState<boolean>(false);
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showAddModal, setShowAddModal] = useState<boolean>(false);
+  const [showQuantityModal, setShowQuantityModal] = useState<boolean>(false);
+  const [showStorageModal, setShowStorageModal] = useState<boolean>(false);
+  const [currentComponent, setCurrentComponent] =
+    useState<Component>(defaultComponent);
 
   const getComponents = async () => {
     setAppStatus("Loading");
@@ -56,9 +63,15 @@ const Components = () => {
       });
   };
 
+  console.log(currentComponent);
+
   useEffect(() => {
     getComponents();
   }, [searchQuery]);
+
+  useEffect(() => {
+    console.log(components);
+  }, [components]);
 
   const handleToggleFilter = () => {
     setShowFilter(!showFilter);
@@ -78,7 +91,7 @@ const Components = () => {
           <button
             className="bg-white rounded-default h-[5rem] text-[1.8rem] font-bold flex gap-8 items-center p-[1.2rem] cursor-pointer"
             onClick={() => {
-              setShowModal(true);
+              setShowAddModal(true);
             }}
           >
             <IoMdAddCircleOutline className="w-[2.5rem] h-[2.5rem]" />
@@ -112,21 +125,26 @@ const Components = () => {
           />
         )}
       </div>
-      {appStatus === "Loading" ? (
-        <Loading />
+      {appStatus === "Loading" ? <Loading /> : null}
+      {components.length === 0 ? (
+        <ResultNotFound />
       ) : (
         <div
           className={`grid grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-6 font-medium text-textColor 
-          text-[1.4rem] px-[5.6rem] pb-[4rem] ${showFilter ? "mt-[28.6rem]" : "mt-[18rem]"}`}
+          text-[1.4rem] px-[5.6rem] pb-[4rem] ${showFilter ? "mt-[28.6rem]" : "mt-[18rem]"} `}
         >
-          {components?.map((component) => (
+          {components.map((component) => (
             <div
               key={component.id}
               className="bg-white p-8 rounded-[1rem] overflow-hidden "
             >
-              <div className="flex justify-start items-center gap-4 font-bold text-[2rem] font-feature ">
+              <div className="flex justify-start items-center gap-8 font-bold text-[2rem] font-feature ">
                 <img
-                  src={component.image}
+                  src={
+                    component.images[0].image_url
+                      ? component.images[0].image_url
+                      : "/defaultComponent.png"
+                  }
                   alt="component"
                   className="h-[15rem] w-[15rem] rounded-[0.5rem]"
                 />
@@ -167,7 +185,11 @@ const Components = () => {
                 </div>
                 <button
                   className="w-full h-[4rem] rounded-default flex justify-center items-center gap-4
-                bg-bgColor text-white font-bold"
+                 bg-bgColor text-white font-bold"
+                  onClick={() => {
+                    setCurrentComponent(component);
+                    setShowQuantityModal(true);
+                  }}
                 >
                   <span>რაოდენობის განახლება</span>
                   <FaSortAmountUpAlt className="h-[2.4rem] mt-[-0.5rem]" />
@@ -189,6 +211,10 @@ const Components = () => {
                 <button
                   className="w-full h-[4rem] rounded-default flex justify-center items-center gap-4
                 bg-green text-white font-bold"
+                  onClick={() => {
+                    setCurrentComponent(component);
+                    setShowStorageModal(true);
+                  }}
                 >
                   <span>ადგილმდებარეობის განახლება</span>
                   <ImDrawer className="h-[2.4rem] mt-[-0.5rem]" />
@@ -198,10 +224,32 @@ const Components = () => {
           ))}
         </div>
       )}
-      {showModal && (
-        <Modal setShowModal={setShowModal} title="კომპონენტის დამატება">
-          <Form />
-        </Modal>
+
+      {showAddModal && (
+        <AddComponent
+          setShowAddModal={setShowAddModal}
+          components={components}
+          setComponents={setComponents}
+        />
+      )}
+
+      {showQuantityModal && (
+        <UpdateQuantity
+          setShowQuantityModal={setShowQuantityModal}
+          components={components}
+          setComponents={setComponents}
+          currentComponent={currentComponent}
+        />
+      )}
+
+      {showStorageModal && (
+        <UpdateStorage
+          setShowStorageModal={setShowStorageModal}
+          components={components}
+          setComponents={setComponents}
+          currentComponent={currentComponent}
+          setCurrentComponent={setCurrentComponent}
+        />
       )}
     </section>
   );

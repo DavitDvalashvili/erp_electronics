@@ -3,9 +3,11 @@ import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 import { useElectronics } from "../App";
 
 const Notification = () => {
-  const { response } = useElectronics();
+  const { response, setResponse } = useElectronics();
 
-  console.log(response);
+  setTimeout(() => {
+    setResponse(null);
+  }, 500);
 
   return (
     <div
