@@ -31,3 +31,13 @@ input[type="number"] {
 input[type="date"] {
   line-height: 22px;
 }
+
+.swiper-button-next::after,
+.swiper-button-prev:after {
+  font-size: 30px;
+  color: #063776;
+  font-weight: bold;
+}
+.swiper-pagination-bullet-active {
+  background-color: #063776;
+}

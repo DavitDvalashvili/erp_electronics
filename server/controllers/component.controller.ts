@@ -156,7 +156,7 @@ export const getComponent = async (req: Request, res: Response) => {
       GROUP BY c.id, s.cabinet, s.drawer, s.shelf
     `;
 
-    const component: Component = await conn.query(query, [id]);
+    const [component]: Component[] = await conn.query(query, [id]);
 
     res.send(component);
   } catch (err) {

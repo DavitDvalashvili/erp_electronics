@@ -13,10 +13,11 @@ export default {
         textColor: "#334155",
         white: "#FFFEFE",
         black: "#1C1C1C",
-        errorRed: "#FF0000",
+        errorRed: "#DC3546",
         placeholder: "#898A8A",
         popupBackground: "rgba(0, 0, 0, 0.59)",
-        green: "#15CD5C",
+        green: "#2EBFA5",
+        blue: "#0065A1",
       },
       borderRadius: {
         default: "10px",

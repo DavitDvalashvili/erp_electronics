@@ -41,9 +41,9 @@ function App() {
           <Route path="/components" element={<Components />} />
           <Route path="/devices" element={<Devices />} />
           {/* <Route path="/notification" element={<Notification />} /> */}
+          <Route path="/device/:id" element={<Device />} />
+          <Route path="/component/:id" element={<Component />} />
         </Route>
-        <Route path="/device/:id" element={<Device />} />
-        <Route path="/component/:id" element={<Component />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </Router>
