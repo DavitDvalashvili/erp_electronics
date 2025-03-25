@@ -544,3 +544,66 @@ export const deleteImage = async (req: Request, res: Response) => {
     if (conn) conn.end();
   }
 };
+
+export const addDocument = async (req: Request, res: Response) => {
+  let conn;
+
+  const file = req.file;
+  const componentId = req.query.id;
+
+  let response: ResponseStatus;
+
+  try {
+    const fileName = `${file?.filename}`;
+
+    conn = await createConnection();
+
+    const [document] = await conn.query(
+      `SELECT components.data_sheet FROM components  WHERE components.id = ?`,
+      [componentId]
+    );
+
+    if (document) {
+      const fullDocumentPath = path.normalize(
+        path.join(__dirname, "..", "files/documents", document.data_sheet)
+      );
+      fs.unlink(fullDocumentPath, (err) => {
+        if (err) {
+          response = {
+            status: "delete_error",
+            message: "დოკუმენტი ვერ განახლდა",
+          };
+          res.send(response);
+          return;
+        }
+      });
+    } else {
+      if (fileName) {
+        const result = await conn.query(
+          `UPDATE components SET data_sheet = ? WHERE id = ?`,
+          [fileName, componentId]
+        );
+
+        if (result.affectedRows > 0) {
+          response = {
+            status: "inserted",
+            message: "დოკუმენტი წარმატებით დაემატა",
+            insert_id: Number(result.insertId),
+          };
+          res.send(response);
+        } else {
+          response = {
+            status: "insert_error",
+            message: "დოკუმენტი ვერ დაემატა",
+          };
+          res.send(response);
+        }
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json(err);
+  } finally {
+    if (conn) conn.release();
+  }
+};

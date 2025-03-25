@@ -152,8 +152,8 @@ const Components = () => {
                 <h5>{component.name}</h5>
                 <Link to={`/component/${component.id}`}>
                   <button
-                    className="rounded-default flex justify-center items-center border text-bgColor border-bgColor px-3 py-1 
-                  hover:text-white hover:bg-bgColor duration-300 transition"
+                    className="rounded-default flex justify-center items-center border text-textColor border-textColor px-3 py-1 
+                  hover:text-white hover:bg-textColor duration-300 transition"
                   >
                     დეტალურად
                   </button>
@@ -183,7 +183,7 @@ const Components = () => {
                 </div>
                 <button
                   className="w-full h-[4rem] rounded-default flex justify-center items-center gap-4
-                 bg-bgColor text-white font-bold"
+                  font-bold border-green text-green hover:bg-green transition duration-300 hover:text-white border"
                   onClick={() => {
                     setCurrentComponent(component);
                     setModal("update_component_quantity");
@@ -208,7 +208,7 @@ const Components = () => {
                 </div>
                 <button
                   className="w-full h-[4rem] rounded-default flex justify-center items-center gap-4
-                bg-green text-white font-bold"
+                  font-bold border-bgColor text-bgColor hover:bg-bgColor transition duration-300 hover:text-white border"
                   onClick={() => {
                     setCurrentComponent(component);
                     setModal("update_position");

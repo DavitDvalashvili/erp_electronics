@@ -229,7 +229,9 @@ const Component = () => {
           </div>
         </div>
       </div>
-      {modal === "view_pdf" && <PdfViewer component={component} />}
+      {modal === "view_pdf" && (
+        <PdfViewer component={component} setComponent={setComponent} />
+      )}
       {modal === "update_component" && (
         <UpdateComponent component={component} setComponent={setComponent} />
       )}
