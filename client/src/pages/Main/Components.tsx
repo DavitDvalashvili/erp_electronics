@@ -17,6 +17,8 @@ import UpdateQuantity from "../../components/component/UpdateQuantity";
 import { defaultComponent } from "./Component";
 import ResultNotFound from "../../components/ResultNotFound";
 import UpdateStorage from "../../components/component/UpdateStorage";
+import ExportExcel from "../../components/component/ExportExcel";
+import { InteractiveBox } from "../../components/component/InteractiveBox";
 
 const defaultQuery: QueryComponent = {
   name: "",
@@ -110,12 +112,10 @@ const Components = () => {
             <span>{showFilter ? "ფილტრის დამალვა" : "ფილტრის გამოჩენა"}</span>
           </button>
         </div>
-        <div className="mt-[2rem]">
-          <Pagination
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-          />
-        </div>
+        <InteractiveBox
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
         {showFilter && (
           <FilterBox
             searchQuery={searchQuery}

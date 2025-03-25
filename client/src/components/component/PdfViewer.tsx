@@ -5,6 +5,7 @@ import { pageNavigationPlugin } from "@react-pdf-viewer/page-navigation";
 import { getFilePlugin } from "@react-pdf-viewer/get-file";
 import { scrollModePlugin } from "@react-pdf-viewer/scroll-mode";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
+
 import { useElectronics } from "../../App";
 import { Modal } from "../Modal";
 
@@ -23,11 +24,13 @@ const PdfViewer = ({ component }: pdfViewer) => {
 
   console.log(`${API_URL}/files/pdf/${component?.data_sheet}`);
 
+  if (!component?.data_sheet) return;
+
   return (
     <Modal title="DataSheet - ის ნახვა">
       <div className="h-[780px] mx-auto max-w-6xl border border-gray-300 rounded-lg shadow-md">
         <Viewer
-          fileUrl={"https://localhost:4000/files/pdf/1733215917996-1.pdf"}
+          fileUrl={`${API_URL}/files/pdf/${component?.data_sheet}`}
           plugins={[
             pageNavigationPluginInstance,
             getFilePluginInstance,

@@ -4,7 +4,6 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import "@pqina/pintura/pintura.css";
 import Main from "./pages/Main/Main";
 import Components from "./pages/Main/Components";
 import Devices from "./pages/Main/Devices";
@@ -30,7 +29,7 @@ type UseElectronics = {
 };
 
 export const useElectronics = create<UseElectronics>((set) => ({
-  API_URL: "http://localhost:4000",
+  API_URL: "http://localhost:5000",
   response: null,
   setResponse: (response: Response) => set({ response }),
   appStatus: "Loading",

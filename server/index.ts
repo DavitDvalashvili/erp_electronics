@@ -11,6 +11,7 @@ app.use(express.json());
 
 // Serve static files from the 'images' folder
 app.use("/files/images", express.static(path.join(__dirname, "files/images")));
+app.use("/files/pdf", express.static(path.join(__dirname, "files/pdf")));
 
 app.use(
   cors({

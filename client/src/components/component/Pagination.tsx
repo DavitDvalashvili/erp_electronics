@@ -1,35 +1,17 @@
-import { useEffect, useState } from "react";
-import { useElectronics } from "../../App";
-import axios from "axios";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { MdKeyboardArrowRight } from "react-icons/md";
 
 type pagination = {
   searchQuery: QueryComponent;
   setSearchQuery: (query: QueryComponent) => void;
+  components: Component[];
 };
 
-const Pagination = ({ searchQuery, setSearchQuery }: pagination) => {
-  const { API_URL } = useElectronics();
-  const [dataLength, setDataLength] = useState<number>(0);
-
-  const getAllComponents = async () => {
-    await axios
-      .get(`${API_URL}/getComponents`)
-      .then((res) => {
-        if (res.status == 200) {
-          setDataLength(res.data.length);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  useEffect(() => {
-    getAllComponents();
-  }, []);
-
+const Pagination = ({
+  searchQuery,
+  setSearchQuery,
+  components,
+}: pagination) => {
   return (
     <div className="flex items-center justify-start gap-8">
       <div className="flex gap-4">
@@ -46,12 +28,14 @@ const Pagination = ({ searchQuery, setSearchQuery }: pagination) => {
           <MdKeyboardArrowLeft />
         </div>
         {Array.from(
-          { length: Math.ceil(dataLength / searchQuery.pageSize) },
+          { length: Math.ceil(components.length / searchQuery.pageSize) },
           (_, i) => i + 1
         )
           .filter((page) => {
             const currentPage = searchQuery.page;
-            const totalPages = Math.ceil(dataLength / searchQuery.pageSize);
+            const totalPages = Math.ceil(
+              components.length / searchQuery.pageSize
+            );
 
             if (currentPage <= 2) {
               return page <= 5;
@@ -86,7 +70,8 @@ const Pagination = ({ searchQuery, setSearchQuery }: pagination) => {
              cursor-pointer hover:bg-bgColor hover:text-white"
           onClick={() => {
             if (
-              searchQuery.page < Math.ceil(dataLength / searchQuery.pageSize)
+              searchQuery.page <
+              Math.ceil(components.length / searchQuery.pageSize)
             ) {
               setSearchQuery({ ...searchQuery, page: searchQuery.page + 1 });
             }
