@@ -4,9 +4,10 @@ type Form = {
   formData: Component;
   setFormData: (value: React.SetStateAction<Component>) => void;
   submitFunction: () => void;
+  type: string;
 };
 
-const Form = ({ setFormData, formData, submitFunction }: Form) => {
+const Form = ({ setFormData, formData, submitFunction, type }: Form) => {
   const [focusDate, setFocusDate] = useState<boolean>(false);
   const [validationsMessage, setValidationsMessage] = useState<string | null>(
     null
@@ -290,7 +291,7 @@ const Form = ({ setFormData, formData, submitFunction }: Form) => {
         className="text-[1.6rem] rounded-default flex justify-center items-center
          bg-green text-white font-bold px-[3rem] py-3 mx-auto mt-3"
       >
-        დამატება
+        {type}
       </button>
     </form>
   );

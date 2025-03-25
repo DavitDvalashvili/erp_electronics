@@ -11,7 +11,7 @@ const Notification = () => {
 
   return (
     <div
-      className="w-screen h-screen bg-popupBackground absolute top-0 left-0 flex justify-center items-center font-firago 
+      className="w-screen h-screen bg-popupBackground absolute top-0 left-0 z-20 flex justify-center items-center font-firago 
      font-feature font-medium"
     >
       {response?.status === "inserted" ||

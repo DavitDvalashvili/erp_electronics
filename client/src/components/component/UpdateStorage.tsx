@@ -4,21 +4,16 @@ import axios from "axios";
 import { useElectronics } from "../../App";
 
 type updateStorage = {
-  setShowStorageModal: Dispatch<SetStateAction<boolean>>;
-  components: Component[];
-  setComponents: Dispatch<SetStateAction<Component[]>>;
   currentComponent: Component;
   setCurrentComponent: Dispatch<SetStateAction<Component>>;
 };
 
 const UpdateStorage = ({
-  setShowStorageModal,
-  components,
-  setComponents,
   currentComponent,
   setCurrentComponent,
 }: updateStorage) => {
-  const { API_URL, setResponse } = useElectronics();
+  const { API_URL, setResponse, components, setComponents, setModal } =
+    useElectronics();
 
   const handleSubmit = (e: React.FocusEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,7 +34,7 @@ const UpdateStorage = ({
               (component) => component.id !== currentComponent.id
             ),
           ]);
-          setShowStorageModal(false);
+          setModal(null);
           console.log(res.data);
         }
         setResponse(res.data);
@@ -49,13 +44,8 @@ const UpdateStorage = ({
       });
   };
 
-  console.log(currentComponent);
-
   return (
-    <Modal
-      setShowModal={setShowStorageModal}
-      title="ადგილმდებარეობის განახლება"
-    >
+    <Modal title="ადგილმდებარეობის განახლება">
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <div className="flex justify-between items-center gap-4">
           <label
@@ -107,8 +97,8 @@ const UpdateStorage = ({
             უჯრა
           </label>
           <input
-            type="number"
-            name="quantity"
+            type="string"
+            name="drawer"
             value={currentComponent.drawer}
             onChange={(e) => {
               setCurrentComponent({

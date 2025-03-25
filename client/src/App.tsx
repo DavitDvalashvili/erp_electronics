@@ -4,6 +4,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+import "@pqina/pintura/pintura.css";
 import Main from "./pages/Main/Main";
 import Components from "./pages/Main/Components";
 import Devices from "./pages/Main/Devices";
@@ -22,6 +23,10 @@ type UseElectronics = {
   setResponse: (response: Response) => void;
   appStatus: AppStatus;
   setAppStatus: (appStatus: AppStatus) => void;
+  modal: Modal;
+  setModal: (modal: Modal) => void;
+  components: Component[];
+  setComponents: (components: Component[]) => void;
 };
 
 export const useElectronics = create<UseElectronics>((set) => ({
@@ -30,6 +35,10 @@ export const useElectronics = create<UseElectronics>((set) => ({
   setResponse: (response: Response) => set({ response }),
   appStatus: "Loading",
   setAppStatus: (appStatus: AppStatus) => set({ appStatus }),
+  modal: null,
+  setModal: (modal: Modal) => set({ modal }),
+  components: [],
+  setComponents: (components: Component[]) => set({ components }),
 }));
 
 function App() {

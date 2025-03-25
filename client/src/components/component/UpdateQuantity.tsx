@@ -1,13 +1,10 @@
-import { Dispatch, SetStateAction, useEffect } from "react";
 import { Modal } from "../Modal";
 import { useState } from "react";
 import axios from "axios";
 import { useElectronics } from "../../App";
+import { useEffect } from "react";
 
 type updateComponent = {
-  setShowQuantityModal: Dispatch<SetStateAction<boolean>>;
-  components: Component[];
-  setComponents: Dispatch<SetStateAction<Component[]>>;
   currentComponent: Component;
 };
 
@@ -23,14 +20,9 @@ const defaultQuantity = {
   updatedQuantity: "",
 };
 
-const UpdateQuantity = ({
-  setShowQuantityModal,
-  components,
-  setComponents,
-  currentComponent,
-}: updateComponent) => {
-  const { API_URL, setResponse } = useElectronics();
-
+const UpdateQuantity = ({ currentComponent }: updateComponent) => {
+  const { API_URL, setResponse, setComponents, components, setModal } =
+    useElectronics();
   const [quantity, setQuantity] = useState<Quantity>(defaultQuantity);
   const [newQuantity, setNewQuantity] = useState<number>(0);
 
@@ -68,7 +60,7 @@ const UpdateQuantity = ({
               (component) => component.id !== updatedComponent.id
             ),
           ]);
-          setShowQuantityModal(false);
+          setModal(null);
           setQuantity(defaultQuantity);
         }
         setResponse(res.data);
@@ -90,7 +82,7 @@ const UpdateQuantity = ({
   };
 
   return (
-    <Modal setShowModal={setShowQuantityModal} title="რაოდენობის განახლება">
+    <Modal title="რაოდენობის განახლება">
       <div className="flex flex-col gap-4 pb-4 text-[1.6rem] pr-4">
         <div className="flex justify-between items-center">
           <span>რაოდენობა</span>

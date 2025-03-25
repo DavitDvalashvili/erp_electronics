@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import { createConnection } from "../db/database";
 import { ResponseStatus } from "../types/type";
 import { Component, Storage, FilterTermsComponent } from "../types/type";
-import { error } from "console";
+import path from "path";
+import fs from "fs";
 
 export const getComponents = async (req: Request, res: Response) => {
   let conn;
@@ -114,15 +115,13 @@ export const getComponents = async (req: Request, res: Response) => {
     res.send(components);
   } catch (error) {
     console.log(error);
-    res
-      .status(500)
-      .send({ error: "An error occurred while fetching components" });
+    res.status(500).send({ "An error fetching components": error });
   } finally {
     if (conn) {
       try {
         conn.release();
       } catch (error) {
-        console.error("An error occurred while fetching components:", error);
+        console.error("An error fetching components:", error);
       }
     }
   }
@@ -156,14 +155,17 @@ export const getComponent = async (req: Request, res: Response) => {
       GROUP BY c.id, s.cabinet, s.drawer, s.shelf
     `;
 
-    const [component]: Component[] = await conn.query(query, [id]);
+    const component: Component[] = await conn.query(query, [id]);
 
-    res.send(component);
-  } catch (err) {
-    console.log(err);
-    res
-      .status(500)
-      .send({ error: "An error occurred while fetching component" });
+    if (component.length === 0) {
+      res.status(404).send({ message: "component not found" });
+      return;
+    }
+
+    res.send(component[0]);
+  } catch (error) {
+    console.log(error);
+    res.status(505).send({ "An error fetching component": error });
   } finally {
     if (conn) conn.release();
   }
@@ -264,9 +266,9 @@ export const addComponent = async (
       };
       res.send(status);
     }
-  } catch (err) {
-    console.log(err);
-    res.status(500).send(error);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ "add component error:": error });
   } finally {
     if (conn) conn.release();
   }
@@ -342,8 +344,6 @@ export const updateComponent = async (req: Request, res: Response) => {
       id,
     ]);
 
-    console.log(updatedComponent);
-
     if (updatedComponent.affectedRows > 0) {
       await conn
         .query(
@@ -371,9 +371,9 @@ export const updateComponent = async (req: Request, res: Response) => {
       };
       res.send(status);
     }
-  } catch (err) {
-    console.log(err);
-    res.status(500).send(error);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ "update component error": error });
   } finally {
     if (conn) conn.release();
   }
@@ -381,7 +381,7 @@ export const updateComponent = async (req: Request, res: Response) => {
 
 export const deleteComponent = async (req: Request, res: Response) => {
   let conn;
-  const id = req.params.id as string;
+  const id = req.params.id as string | number;
 
   let status: ResponseStatus;
 
@@ -405,9 +405,9 @@ export const deleteComponent = async (req: Request, res: Response) => {
       };
       res.send(status);
     }
-  } catch (err) {
-    res.status(500).send(error);
-    console.log(err);
+  } catch (error) {
+    res.status(500).send({ "delete component error": error });
+    console.log(error);
   } finally {
     if (conn) await conn.release();
   }
@@ -439,12 +439,108 @@ export const getFilterTerms = async (req: Request, res: Response) => {
     }
 
     res.send(filterTerms[0]);
-  } catch (err) {
-    console.log(err);
-    res
-      .status(500)
-      .send({ error: "An error occurred while fetching filter terms" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ "An error filter terms": error });
   } finally {
     if (conn) conn.release();
+  }
+};
+
+export const addImage = async (req: Request, res: Response) => {
+  let conn;
+
+  const file = req.file;
+  const componentId = req.query.id;
+
+  let response: ResponseStatus;
+
+  try {
+    const fileName = `${file?.filename}`;
+
+    conn = await createConnection();
+
+    if (fileName) {
+      const result = await conn.query(
+        `INSERT INTO images (image_url, component_id) VALUES (?, ?)`,
+        [fileName, componentId]
+      );
+
+      if (result.affectedRows > 0) {
+        response = {
+          status: "inserted",
+          message: "ფოტო წარმატებით დაემატა",
+          insert_id: Number(result.insertId),
+        };
+        res.send(response);
+      } else {
+        response = {
+          status: "insert_error",
+          message: "ფოტო ვერ დაემატა",
+        };
+        res.send(response);
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json(err);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
+export const deleteImage = async (req: Request, res: Response) => {
+  let conn;
+
+  const imageId = req.params.imageId as string | number;
+
+  let response: ResponseStatus;
+
+  try {
+    conn = await createConnection();
+
+    const [image] = await conn.query(
+      `SELECT images.image_url FROM images WHERE images.id = ?;`,
+      [imageId]
+    );
+
+    if (!image) {
+      res.status(404).send({ message: "Image not found" });
+      return;
+    }
+
+    const fullImagePath = path.normalize(
+      path.join(__dirname, "..", "files/images", image.image_url)
+    );
+
+    const result = await conn.query(
+      `DELETE FROM images i
+       WHERE i.id = ?`,
+      [imageId]
+    );
+
+    if (result.affectedRows > 0) {
+      fs.unlink(fullImagePath, (err) => {
+        if (err) {
+          response = {
+            status: "delete_error",
+            message: "ფოტო ვერ წაიშალა",
+          };
+          res.send(response);
+          console.log(err);
+          return;
+        }
+        response = {
+          status: "deleted",
+          message: "ფოტო წარმატებით წაიშალა",
+        };
+        res.send(response);
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: "server error" });
+  } finally {
+    if (conn) conn.end();
   }
 };

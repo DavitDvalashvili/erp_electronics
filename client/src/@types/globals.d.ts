@@ -19,8 +19,17 @@ type ResponseStatus = {
   insert_id?: number | string;
 };
 
+type Modal =
+  | "add_component"
+  | "update_component"
+  | "update_component_quantity"
+  | "update_position"
+  | "delete_component"
+  | "add_image"
+  | "delete_image"
+  | null;
+
 interface Props {
-  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   title: string;
   children: React.ReactNode;
 }
@@ -42,7 +51,8 @@ type QueryComponent = {
 
 type Image = {
   image_id: number | null;
-  image_url: string | null;
+  image_url: string;
+  preview?: boolean;
 };
 
 type Component = {

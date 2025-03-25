@@ -41,3 +41,10 @@ input[type="date"] {
 .swiper-pagination-bullet-active {
   background-color: #063776;
 }
+
+.swiper-slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 456px;
+}

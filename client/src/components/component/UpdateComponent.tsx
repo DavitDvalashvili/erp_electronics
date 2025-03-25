@@ -6,24 +6,22 @@ import { useElectronics } from "../../App";
 import axios from "axios";
 
 type updateComponent = {
-  setShowUpdateModal: Dispatch<SetStateAction<boolean>>;
   component: Component;
+  setComponent: Dispatch<SetStateAction<Component>>;
 };
 
-const UpdateComponent = ({
-  setShowUpdateModal,
-  component,
-}: updateComponent) => {
+const UpdateComponent = ({ component, setComponent }: updateComponent) => {
   const [formData, setFormData] = useState<Component>(component);
-  const { API_URL, setResponse } = useElectronics();
+  const { API_URL, setResponse, setModal } = useElectronics();
 
   const updateComponent = async () => {
     await axios
-      .post(`${API_URL}/addComponent`, formData)
+      .post(`${API_URL}/updateComponent/${component.id}`, formData)
       .then((res) => {
-        if (res.data.status === "inserted") {
+        if (res.data.status === "updated") {
+          setComponent(formData);
           setResponse(res.data);
-          setShowUpdateModal(false);
+          setModal(null);
         }
       })
       .catch((error) => {
@@ -32,11 +30,12 @@ const UpdateComponent = ({
   };
 
   return (
-    <Modal setShowModal={setShowUpdateModal} title="კომპონენტის დამატება">
+    <Modal title="კომპონენტის განახლება">
       <Form
         setFormData={setFormData}
         formData={formData}
         submitFunction={updateComponent}
+        type="განახლება"
       />
     </Modal>
   );

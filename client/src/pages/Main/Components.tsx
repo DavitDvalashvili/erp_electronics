@@ -34,13 +34,17 @@ const defaultQuery: QueryComponent = {
 };
 
 const Components = () => {
-  const { API_URL, appStatus, setAppStatus } = useElectronics();
-  const [components, setComponents] = useState<Component[]>([]);
+  const {
+    API_URL,
+    appStatus,
+    setAppStatus,
+    setComponents,
+    components,
+    modal,
+    setModal,
+  } = useElectronics();
   const [searchQuery, setSearchQuery] = useState<QueryComponent>(defaultQuery);
   const [showFilter, setShowFilter] = useState<boolean>(false);
-  const [showAddModal, setShowAddModal] = useState<boolean>(false);
-  const [showQuantityModal, setShowQuantityModal] = useState<boolean>(false);
-  const [showStorageModal, setShowStorageModal] = useState<boolean>(false);
   const [currentComponent, setCurrentComponent] =
     useState<Component>(defaultComponent);
 
@@ -63,15 +67,9 @@ const Components = () => {
       });
   };
 
-  console.log(currentComponent);
-
   useEffect(() => {
     getComponents();
   }, [searchQuery]);
-
-  useEffect(() => {
-    console.log(components);
-  }, [components]);
 
   const handleToggleFilter = () => {
     setShowFilter(!showFilter);
@@ -80,7 +78,7 @@ const Components = () => {
   if (appStatus === "Server Error") return <ServerError />;
 
   return (
-    <section className=" bg-green-500 h-screen font-firago w-full overflow-y-scroll">
+    <section className=" bg-green-500 h-screen w-full overflow-y-scroll font-firago font-feature">
       <div className="fixed t-0 w-[calc(100vw-28.5rem)] xl:w-[calc(192rem-38.5rem)] bg-bgColorSecondary px-[5.6rem] pt-[4rem] pb-[3rem]">
         <div className="flex gap-8 ">
           <div className="bg-white rounded-default p-[1.2rem] flex gap-8 text-[1.8rem] font-bold items-center h-[5rem] w-fit ">
@@ -91,7 +89,7 @@ const Components = () => {
           <button
             className="bg-white rounded-default h-[5rem] text-[1.8rem] font-bold flex gap-8 items-center p-[1.2rem] cursor-pointer"
             onClick={() => {
-              setShowAddModal(true);
+              setModal("add_component");
             }}
           >
             <IoMdAddCircleOutline className="w-[2.5rem] h-[2.5rem]" />
@@ -188,7 +186,7 @@ const Components = () => {
                  bg-bgColor text-white font-bold"
                   onClick={() => {
                     setCurrentComponent(component);
-                    setShowQuantityModal(true);
+                    setModal("update_component_quantity");
                   }}
                 >
                   <span>რაოდენობის განახლება</span>
@@ -213,10 +211,10 @@ const Components = () => {
                 bg-green text-white font-bold"
                   onClick={() => {
                     setCurrentComponent(component);
-                    setShowStorageModal(true);
+                    setModal("update_position");
                   }}
                 >
-                  <span>ადგილმდებარეობის განახლება</span>
+                  <span>ადგილი განახლება</span>
                   <ImDrawer className="h-[2.4rem] mt-[-0.5rem]" />
                 </button>
               </div>
@@ -225,28 +223,13 @@ const Components = () => {
         </div>
       )}
 
-      {showAddModal && (
-        <AddComponent
-          setShowAddModal={setShowAddModal}
-          components={components}
-          setComponents={setComponents}
-        />
+      {modal === "add_component" && <AddComponent />}
+      {modal === "update_component_quantity" && (
+        <UpdateQuantity currentComponent={currentComponent} />
       )}
 
-      {showQuantityModal && (
-        <UpdateQuantity
-          setShowQuantityModal={setShowQuantityModal}
-          components={components}
-          setComponents={setComponents}
-          currentComponent={currentComponent}
-        />
-      )}
-
-      {showStorageModal && (
+      {modal === "update_position" && (
         <UpdateStorage
-          setShowStorageModal={setShowStorageModal}
-          components={components}
-          setComponents={setComponents}
           currentComponent={currentComponent}
           setCurrentComponent={setCurrentComponent}
         />
