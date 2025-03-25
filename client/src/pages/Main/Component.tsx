@@ -14,6 +14,8 @@ import DeleteComponent from "../../components/component/DeleteComponent";
 import UpdateStorage from "../../components/component/UpdateStorage";
 import UpdateQuantity from "../../components/component/UpdateQuantity";
 import ImageBox from "../../components/ImageBox";
+import { MdOutlinePictureAsPdf } from "react-icons/md";
+import PdfViewer from "../../components/component/PdfViewer";
 
 export const defaultComponent: Component = {
   id: "",
@@ -213,6 +215,21 @@ const Component = () => {
         </div>
       </div>
       <ImageBox images={images} setImages={setImages} />
+      <div className="grid grid-cols-5 mt-8 ">
+        <div className="h-full flex justify-center items-center">
+          <div
+            className=" h-full rounded-default flex flex-col justify-center items-center gap-5  border-2
+          border-bgColor cursor-pointer p-[2rem] text-textColor"
+            onClick={() => {
+              setModal("view_pdf");
+            }}
+          >
+            <MdOutlinePictureAsPdf className="w-[8rem] h-[8rem] " />
+            <span className=" text-[1.4rem]">DataSheet-ის ნახვა</span>
+          </div>
+        </div>
+      </div>
+      {modal === "view_pdf" && <PdfViewer component={component} />}
       {modal === "update_component" && (
         <UpdateComponent component={component} setComponent={setComponent} />
       )}

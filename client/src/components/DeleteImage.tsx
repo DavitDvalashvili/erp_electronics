@@ -50,7 +50,7 @@ const DeleteImage = ({ images, setImages, currentImage }: DeleteImage) => {
               : `${API_URL}/files/images/${currentImage?.image_url}`
           }
           alt={`component ${currentImage?.image_id}`}
-          className="h-[20em]"
+          className="h-[20em] rounded-default"
         />
       </div>
       <button

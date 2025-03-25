@@ -31,11 +31,12 @@ const ImageBox = ({ images, setImages }: images) => {
                     : `${API_URL}/files/images/${image.image_url}`
                 }
                 alt="componentImage"
+                className="h-[15rem] rounded-default"
               />
             </div>
             <button
               className="h-[4rem] rounded-default flex justify-center items-center gap-4
-            border border-errorRed text-errorRed font-bold hover:bg-errorRed transition duration-300
+              border border-errorRed text-errorRed font-bold hover:bg-errorRed transition duration-300
             hover:text-white text-[1.3rem] mx-auto px-8"
               onClick={() => {
                 setModal("delete_image");

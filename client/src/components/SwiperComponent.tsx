@@ -35,6 +35,7 @@ const SwiperComponent = ({ images }: images) => {
                     ? `${API_URL}/files/images/${image.image_url}`
                     : "/defaultComponent.png"
               }
+              className="max-h-[45.4rem]"
               alt="Component Image"
             />
           </SwiperSlide>

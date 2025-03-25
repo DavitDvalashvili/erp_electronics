@@ -40,7 +40,6 @@ const AddImage = ({ images, setImages }: images) => {
         .post(`${API_URL}/addImage?id=${Id}`, formData)
         .then((res) => {
           if (res.data.status === "inserted") {
-            console.log(images);
             if (images[0].image_id === null) {
               setImages([
                 {
@@ -62,6 +61,7 @@ const AddImage = ({ images, setImages }: images) => {
             setModal(null);
           }
           setResponse(res.data);
+          setFile(undefined);
         })
         .catch((err) => {
           console.log(err);
@@ -70,46 +70,55 @@ const AddImage = ({ images, setImages }: images) => {
   };
 
   const takePicture = () => {
-    setTimeout(() => {
-      if (videoRef.current) {
-        const screenshot = videoRef?.current.getScreenshot();
-        if (screenshot) {
-          setPreviewUrl(screenshot);
-          const photo = new File([screenshot], "photo.png", {
-            type: "image/png",
-          });
-          setFile(photo);
+    if (videoRef.current) {
+      const imageSrc = videoRef.current.getScreenshot();
+      if (imageSrc) {
+        setPreviewUrl(imageSrc);
+
+        // Convert base64 image to a Blob
+        const byteString = atob(imageSrc.split(",")[1]);
+        const mimeString = imageSrc.split(",")[0].split(":")[1].split(";")[0];
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uint8Array = new Uint8Array(arrayBuffer);
+
+        for (let i = 0; i < byteString.length; i++) {
+          uint8Array[i] = byteString.charCodeAt(i);
         }
-        setWebCamMode(false);
+
+        const blob = new Blob([arrayBuffer], { type: mimeString });
+        const photo = new File([blob], "photo.jpg", { type: mimeString });
+
+        setFile(photo);
       }
-    }, 100);
+      setWebCamMode(false);
+    }
   };
+
+  useEffect(() => {
+    setFile(undefined);
+  }, [Modal]);
 
   return (
     <Modal title="ფოტოს დამატება">
       <>
-        <div className="">
-          <img
-            src={previewUrl}
-            alt="PreviewComponent"
-            className="h-[20rem] w-fit mb-4 mx-auto "
-          />
-          <button
-            className="text-[1.6rem] rounded-default flex justify-center items-center
-            bg-green text-white font-bold px-[3rem] py-3 mx-auto"
-            onClick={() => addImage()}
-          >
-            დამატება
-          </button>
-        </div>
-        <input
-          type="file"
-          ref={imageRef}
-          onChange={handleChange}
-          className=""
-        />
+        {previewUrl && (
+          <div className="px-4">
+            <img
+              src={previewUrl}
+              alt="PreviewComponent"
+              className="h-[30rem] w-fit mb-4 mx-auto rounded-default "
+            />
+            <button
+              className="text-[1.6rem] rounded-default flex justify-center items-center
+             bg-green text-white font-bold px-[3rem] py-3 mx-auto"
+              onClick={() => addImage()}
+            >
+              დამატება
+            </button>
+          </div>
+        )}
 
-        {!uploadImage && !webCamMode && (
+        {!webCamMode && !uploadImage && !file && (
           <div className="flex gap-8 p-4">
             <div
               className="rounded-default flex flex-col justify-center items-center gap-5  border-dashed border-2 
@@ -130,18 +139,27 @@ const AddImage = ({ images, setImages }: images) => {
                 <MdOutlineAddAPhoto className="w-[8rem] h-[8rem] " />
                 <span className=" text-[1.4rem]">ფოტოს გადაღება</span>
               </div>
+              <input
+                type="file"
+                ref={imageRef}
+                onChange={handleChange}
+                className="hidden"
+              />
             </div>
           </div>
         )}
+
         {webCamMode && (
-          <div>
-            <Webcam audio={false} width="100%" ref={videoRef} />
+          <div className="px-4 flex flex-col">
+            <Webcam audio={false} ref={videoRef} className="w-[45.4rem]" />
+
             <button
-              className="text-[1.6rem] rounded-default flex justify-center items-center
-            bg-green text-white font-bold px-[3rem] py-3 mx-auto"
+              className="text-[1.6rem] rounded-default
+             bg-bgColor text-white font-bold px-[3rem] py-3 mx-auto mt-4 flex justify-center gap-2 items-center"
               onClick={takePicture}
             >
-              გადაღება
+              <span>გადაღება</span>
+              <MdOutlineAddAPhoto className="mb-[0.3rem]" />
             </button>
           </div>
         )}
