@@ -45,7 +45,6 @@ const AddImage = ({ images, setImages }: images) => {
                 {
                   image_id: res.data.insert_id,
                   image_url: previewUrl,
-                  preview: true,
                 },
               ]);
             } else {
@@ -54,7 +53,6 @@ const AddImage = ({ images, setImages }: images) => {
                 {
                   image_id: res.data.insert_id,
                   image_url: previewUrl,
-                  preview: true,
                 },
               ]);
             }

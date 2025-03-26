@@ -45,7 +45,7 @@ const DeleteImage = ({ images, setImages, currentImage }: DeleteImage) => {
         </p>
         <img
           src={
-            currentImage?.preview
+            currentImage?.image_url?.startsWith("blob:")
               ? currentImage?.image_url
               : `${API_URL}/files/images/${currentImage?.image_url}`
           }

@@ -139,8 +139,10 @@ const Components = () => {
               <div className="flex justify-start items-center gap-8 font-bold text-[2rem] font-feature ">
                 <img
                   src={
-                    component.images[0].image_url
-                      ? component.images[0].image_url
+                    component.images[0]?.image_url
+                      ? component.images[0]?.image_url.startsWith("blob:")
+                        ? component.images[0]?.image_url
+                        : `${API_URL}/files/images/${component.images[0]?.image_url}`
                       : "/defaultComponent.png"
                   }
                   alt="component"

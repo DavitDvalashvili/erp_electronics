@@ -13,7 +13,7 @@ app.use(express.json());
 app.use("/files/images", express.static(path.join(__dirname, "files/images")));
 app.use(
   "/files/documents",
-  express.static(path.join(__dirname, "files", "documents"))
+  express.static(path.join(__dirname, "files/documents"))
 );
 
 app.use(

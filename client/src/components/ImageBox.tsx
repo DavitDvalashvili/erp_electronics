@@ -26,8 +26,8 @@ const ImageBox = ({ images, setImages }: images) => {
             <div className="h-full flex justify-center items-center w-full">
               <img
                 src={
-                  image.preview
-                    ? image.image_url
+                  image?.image_url?.startsWith("blob:")
+                    ? image?.image_url
                     : `${API_URL}/files/images/${image.image_url}`
                 }
                 alt="componentImage"

@@ -53,7 +53,6 @@ type QueryComponent = {
 type Image = {
   image_id: number | null;
   image_url: string;
-  preview?: boolean;
 };
 
 type Component = {

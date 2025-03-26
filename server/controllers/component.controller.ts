@@ -553,6 +553,8 @@ export const addDocument = async (req: Request, res: Response) => {
 
   let response: ResponseStatus;
 
+  console.log(file?.filename);
+
   try {
     const fileName = `${file?.filename}`;
 
@@ -563,20 +565,41 @@ export const addDocument = async (req: Request, res: Response) => {
       [componentId]
     );
 
-    if (document) {
+    if (document.data_sheet) {
       const fullDocumentPath = path.normalize(
         path.join(__dirname, "..", "files/documents", document.data_sheet)
       );
       fs.unlink(fullDocumentPath, (err) => {
         if (err) {
           response = {
-            status: "delete_error",
+            status: "update_error",
             message: "დოკუმენტი ვერ განახლდა",
           };
           res.send(response);
           return;
         }
       });
+      if (fileName) {
+        const result = await conn.query(
+          `UPDATE components SET data_sheet = ? WHERE id = ?`,
+          [fileName, componentId]
+        );
+
+        if (result.affectedRows > 0) {
+          response = {
+            status: "inserted",
+            message: "დოკუმენტი წარმატებით დაემატა",
+            insert_id: Number(result.insertId),
+          };
+          res.send(response);
+        } else {
+          response = {
+            status: "insert_error",
+            message: "დოკუმენტი ვერ დაემატა",
+          };
+          res.send(response);
+        }
+      }
     } else {
       if (fileName) {
         const result = await conn.query(

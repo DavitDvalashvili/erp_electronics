@@ -24,12 +24,13 @@ const PdfViewer = ({ component, setComponent }: pdfViewer) => {
       await axios
         .post(`${API_URL}/addDocument?id=${Id}`, formData)
         .then((res) => {
-          if (res.data.status === "inserted" && res.data.status === "updated") {
+          if (res.data.status === "inserted" || res.data.status === "updated") {
             setComponent({
               ...component,
               data_sheet: URL.createObjectURL(file),
             });
           }
+          console.log(res.data);
           setResponse(res.data);
           if (documentRef.current) {
             documentRef.current.value = "";
@@ -40,6 +41,8 @@ const PdfViewer = ({ component, setComponent }: pdfViewer) => {
         });
     }
   };
+
+  console.log(`${API_URL}/files/documents/${component?.data_sheet}`);
 
   return (
     <Modal title="DataSheet - ის ნახვა">
@@ -55,7 +58,7 @@ const PdfViewer = ({ component, setComponent }: pdfViewer) => {
               src={
                 component?.data_sheet?.startsWith("blob:")
                   ? component.data_sheet
-                  : `${API_URL}/files/documents/${component?.data_sheet || ""}`
+                  : `${API_URL}/files/documents/${component?.data_sheet}`
               }
               width="100%"
               title="PDF Viewer"

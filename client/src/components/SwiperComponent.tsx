@@ -29,11 +29,11 @@ const SwiperComponent = ({ images }: images) => {
           <SwiperSlide key={index} className="bg-white">
             <img
               src={
-                image.preview
-                  ? image.image_url
-                  : image.image_url
-                    ? `${API_URL}/files/images/${image.image_url}`
-                    : "/defaultComponent.png"
+                image?.image_url
+                  ? image.image_url.startsWith("blob:")
+                    ? image.image_url
+                    : `${API_URL}/files/images/${image.image_url}`
+                  : "/defaultComponent.png"
               }
               className="max-h-[45.4rem]"
               alt="Component Image"
