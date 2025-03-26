@@ -26,6 +26,8 @@ type UseElectronics = {
   setModal: (modal: Modal) => void;
   components: Component[];
   setComponents: (components: Component[]) => void;
+  devices: Device[];
+  setDevices: (devices: Device[]) => void;
 };
 
 export const useElectronics = create<UseElectronics>((set) => ({
@@ -38,6 +40,8 @@ export const useElectronics = create<UseElectronics>((set) => ({
   setModal: (modal: Modal) => set({ modal }),
   components: [],
   setComponents: (components: Component[]) => set({ components }),
+  devices: [],
+  setDevices: (devices: Device[]) => set({ devices }),
 }));
 
 function App() {

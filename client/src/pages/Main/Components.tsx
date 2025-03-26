@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Loading from "../Loading";
 import ServerError from "../ServerError";
-import Pagination from "../../components/component/Pagination";
 import FilterBox from "../../components/component/FilterBox";
 import { FaSortAmountUpAlt } from "react-icons/fa";
 import { ImDrawer } from "react-icons/im";
@@ -17,22 +16,21 @@ import UpdateQuantity from "../../components/component/UpdateQuantity";
 import { defaultComponent } from "./Component";
 import ResultNotFound from "../../components/ResultNotFound";
 import UpdateStorage from "../../components/component/UpdateStorage";
-import ExportExcel from "../../components/component/ExportExcel";
 import { InteractiveBox } from "../../components/component/InteractiveBox";
 
 const defaultQuery: QueryComponent = {
-  name: "",
-  family: "",
-  package_type: "",
-  nominal_value: "",
-  electrical_supply: "",
+  names: "",
+  families: "",
+  package_types: "",
+  nominal_values: "",
+  electrical_supplies: "",
   suppliers_name: "",
-  cabinet: "",
-  shelf: "",
-  drawer: "",
+  cabinets: "",
+  shelves: "",
+  drawers: "",
   searchTerm: "",
   page: 1,
-  pageSize: 4,
+  pageSize: 10,
 };
 
 const Components = () => {
@@ -45,18 +43,17 @@ const Components = () => {
     modal,
     setModal,
   } = useElectronics();
+
   const [searchQuery, setSearchQuery] = useState<QueryComponent>(defaultQuery);
   const [showFilter, setShowFilter] = useState<boolean>(false);
+  let [queryString, setQuerystring] = useState("");
   const [currentComponent, setCurrentComponent] =
     useState<Component>(defaultComponent);
 
   const getComponents = async () => {
     setAppStatus("Loading");
     await axios
-      .get(
-        `${API_URL}/getComponents?name=${searchQuery.name}&family=${searchQuery.family}&package_type=${searchQuery.package_type}&nominal_value=${searchQuery.nominal_value}&electrical_supply=${searchQuery.electrical_supply}&suppliers_name=${searchQuery.suppliers_name}&cabinet=${searchQuery.cabinet}&shelf=${searchQuery.shelf}&drawer=${searchQuery.drawer}&searchTerm=${searchQuery.searchTerm}&page=${searchQuery.page}&pageSize=${searchQuery.pageSize}
-        `
-      )
+      .get(`${API_URL}/getComponents?${queryString}`)
       .then((res) => {
         if (res.status == 200) {
           setComponents(res.data);
@@ -70,8 +67,20 @@ const Components = () => {
   };
 
   useEffect(() => {
-    getComponents();
+    const query: string[] = [];
+    for (const key of Object.keys(searchQuery)) {
+      if (searchQuery[key as keyof QueryComponent]) {
+        query.push(`${key}=${searchQuery[key as keyof QueryComponent]}`);
+      }
+    }
+    setQuerystring(query.join("&"));
   }, [searchQuery]);
+
+  useEffect(() => {
+    if (queryString) {
+      getComponents();
+    }
+  }, [queryString]);
 
   const handleToggleFilter = () => {
     setShowFilter(!showFilter);
@@ -131,9 +140,9 @@ const Components = () => {
           className={`grid grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-6 font-medium text-textColor 
           text-[1.4rem] px-[5.6rem] pb-[4rem] ${showFilter ? "mt-[28.6rem]" : "mt-[18rem]"} `}
         >
-          {components.map((component) => (
+          {components.map((component, index) => (
             <div
-              key={component.id}
+              key={index}
               className="bg-white p-8 rounded-[1rem] overflow-hidden "
             >
               <div className="flex justify-start items-center gap-8 font-bold text-[2rem] font-feature ">

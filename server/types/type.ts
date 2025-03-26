@@ -49,15 +49,6 @@ export type Storage = {
   drawer: string;
 };
 
-export type Device = {
-  name: string;
-  purpose: string;
-  electrical_supply: string;
-  size: string;
-  available_quantity: string;
-  unit_cost: string;
-};
-
 export type FilterTermsComponent = {
   names: string[];
   families: string[];
@@ -67,4 +58,21 @@ export type FilterTermsComponent = {
   cabinets: string[];
   drawers: string[];
   shelves: string[];
+};
+
+export type Device = {
+  id?: string | number;
+  name: string;
+  purpose: string;
+  electrical_supply: string;
+  size: string;
+  available_quantity: string;
+  unit_cost: string;
+  images: Image[];
+};
+
+export type FilterTermsDevice = {
+  names: string[];
+  electrical_supplies: string[];
+  sizes: string[];
 };

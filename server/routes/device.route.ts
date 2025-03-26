@@ -15,6 +15,6 @@ deviceRouter.get("/getDevice/:id", getDevice);
 deviceRouter.post("/addDevice", addDevice);
 deviceRouter.post("/updateDevice/:id", updateDevice);
 deviceRouter.delete("/deleteDevice/:id", deleteDevice);
-deviceRouter.delete("/device/getFilterTerms", getFilterTerms);
+deviceRouter.get("/device/getFilterTerms", getFilterTerms);
 
 export default deviceRouter;

@@ -1,43 +1,50 @@
 import { Request, Response } from "express";
 import { createConnection } from "../db/database";
-import { Device } from "../types/type";
+import { Device, FilterTermsDevice } from "../types/type";
 import { ResponseStatus } from "../types/type";
 
 export const getDevices = async (req: Request, res: Response) => {
   let conn;
 
-  // Extract filtering parameters
   const name = (req.query.name as string) || "";
   const electrical_supply = (req.query.electrical_supply as string) || "";
   const size = (req.query.size as string) || "";
-
-  const searchTerm = (req.query.searchTerm as string) || "";
-  const page = parseInt(req.query.page as string, 10) || 1;
-  const pageSize = 4;
+  const searchTerm = req.query.searchTerm as string;
+  const page = parseInt(req.query.page as string) || 1;
+  const pageSize = parseInt(req.query.pageSize as string);
   const offset = (page - 1) * pageSize;
 
   try {
     conn = await createConnection();
 
-    // Base query
     let query = `
-        SELECT 
-        d.name, d.purpose, d.electrical_supply, d.size, d.available_quantity, 
-        d.unit_cost,
-        (SELECT i.image_url
-        FROM images i
-        WHERE i.component_id = d.id
-        LIMIT 1) AS image 
-        FROM devices d
-        WHERE (d.name LIKE ? OR d.electrical_supply LIKE ? OR d.size LIKE ?)`;
+      SELECT 
+        d.*,
+         COALESCE(
+          JSON_ARRAYAGG(
+            JSON_OBJECT(
+              'image_url', i.image_url,
+              'image_id', i.id
+            )
+          ), 
+          JSON_ARRAY()
+        ) AS images
+      FROM 
+        devices d
+      LEFT JOIN 
+        images i ON i.device_id = d.id
+      WHERE 1=1 
+    `;
 
-    const params: (string | number)[] = [
-      `%${searchTerm}%`,
-      `%${searchTerm}%`,
-      `%${searchTerm}%`,
-    ];
+    const params: (string | number)[] = [];
 
-    // Add filtering conditions dynamically
+    if (searchTerm) {
+      query += ` AND (
+        d.name LIKE ? OR d.electrical_supply LIKE ? OR d.size LIKE ? 
+      )`;
+      params.push(`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`);
+    }
+
     if (name) {
       query += ` AND d.name LIKE ?`;
       params.push(`%${name}%`);
@@ -51,25 +58,27 @@ export const getDevices = async (req: Request, res: Response) => {
       params.push(`%${size}%`);
     }
 
-    // Add pagination
-    query += ` LIMIT ? OFFSET ?`;
-    params.push(pageSize, offset);
+    query += ` GROUP BY d.id ORDER BY d.id DESC`;
 
-    // Execute the query
-    const devices = await conn.query(query, params);
+    if (!isNaN(pageSize) && pageSize > 0) {
+      query += ` LIMIT ? OFFSET ?`;
+      params.push(pageSize, offset);
+    }
 
-    res.send({ devices });
+    const devices: [Device[]] = await conn.query(query, params);
+
+    res.send(devices);
   } catch (error) {
     console.log(error);
     res
       .status(500)
-      .send({ "An error occurred while fetching devices:": error });
+      .send({ error: "An error occurred while fetching devices." });
   } finally {
     if (conn) {
       try {
         conn.release();
       } catch (error) {
-        console.error("An error occurred while fetching devices:", error);
+        console.error("An error releasing connection:", error);
       }
     }
   }
@@ -312,23 +321,24 @@ export const getFilterTerms = async (req: Request, res: Response) => {
   let conn;
   try {
     conn = await createConnection();
-    let query = `SELECT 
-    d.name, d.d.electrical_supply, d.size FROM devices`;
 
-    const filterTerms = await conn.query(query);
+    let query = `SELECT 
+        JSON_ARRAYAGG(d.name) AS names,
+        JSON_ARRAYAGG(d.electrical_supply) AS electrical_supplies,
+        JSON_ARRAYAGG(d.size) AS sizes
+      FROM 
+        devices d`;
+
+    const filterTerms: FilterTermsDevice[] = await conn.query(query);
 
     if (filterTerms.length == 0) {
-      res
-        .status(404)
-        .send({ error: "An error occurred while fetching filter terms" });
+      res.status(404).send({ error: "No filter terms found" });
     }
 
-    res.send(filterTerms);
-  } catch (err) {
-    console.log(err);
-    res
-      .status(500)
-      .send({ error: "An error occurred while fetching filter terms" });
+    res.send(filterTerms[0]);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ "An error filter terms": error });
   } finally {
     if (conn) conn.release();
   }

@@ -8,16 +8,16 @@ import fs from "fs";
 export const getComponents = async (req: Request, res: Response) => {
   let conn;
 
-  const name = (req.query.name as string) || "";
-  const family = (req.query.family as string) || "";
-  const package_type = (req.query.package_type as string) || "";
-  const nominal_value = (req.query.nominal_value as string) || "";
-  const electrical_supply = (req.query.electrical_supply as string) || "";
-  const suppliers_name = (req.query.suppliers_name as string) || "";
-  const cabinet = (req.query.cabinet as string) || "";
-  const shelf = (req.query.shelf as string) || "";
-  const drawer = (req.query.drawer as string) || "";
-  const searchTerm = (req.query.searchTerm as string) || "";
+  const name = req.query.names as string;
+  const family = req.query.families as string;
+  const package_type = req.query.package_types as string;
+  const nominal_value = req.query.nominal_values as string;
+  const electrical_supply = req.query.electrical_supplies as string;
+  const suppliers_name = req.query.suppliers_names as string;
+  const cabinet = req.query.cabinets as string;
+  const shelf = req.query.shelves as string;
+  const drawer = req.query.drawers as string;
+  const searchTerm = req.query.searchTerm as string;
   const page = parseInt(req.query.page as string) || 1;
   const pageSize = parseInt(req.query.pageSize as string);
   const offset = (page - 1) * pageSize;
@@ -25,47 +25,49 @@ export const getComponents = async (req: Request, res: Response) => {
   try {
     conn = await createConnection();
 
-    // Base query
     let query = `
-                  SELECT 
-              c.*, s.cabinet, s.shelf, s.drawer,
-              COALESCE(
-                JSON_ARRAYAGG(
-                  JSON_OBJECT(
-                    'image_url', i.image_url,
-                    'image_id', i.id
-                  )
-                ), 
-                JSON_ARRAY()
-              ) AS images
-            FROM 
-              components c
-            JOIN 
-              storage s ON s.component_id = c.id
-            LEFT JOIN 
-              images i ON i.component_id = c.id
-            WHERE 
-              (c.name LIKE ? OR c.family LIKE ? OR c.package_type LIKE ? 
-              OR c.nominal_value LIKE ? OR c.electrical_supply LIKE ? 
-              OR c.suppliers_name LIKE ? OR s.cabinet LIKE ? OR s.shelf LIKE ? 
-              OR s.drawer LIKE ?)
-            GROUP BY 
-              c.id, s.cabinet, s.shelf, s.drawer
-            ORDER BY C.id DESC`;
+      SELECT 
+        c.*, s.cabinet, s.shelf, s.drawer,
+        COALESCE(
+          JSON_ARRAYAGG(
+            JSON_OBJECT(
+              'image_url', i.image_url,
+              'image_id', i.id
+            )
+          ), 
+          JSON_ARRAY()
+        ) AS images
+      FROM 
+        components c
+      JOIN 
+        storage s ON s.component_id = c.id
+      LEFT JOIN 
+        images i ON i.component_id = c.id
+      WHERE 1=1 
+    `;
 
-    const params: (string | number)[] = [
-      `%${searchTerm}%`,
-      `%${searchTerm}%`,
-      `%${searchTerm}%`,
-      `%${searchTerm}%`,
-      `%${searchTerm}%`,
-      `%${searchTerm}%`,
-      `%${searchTerm}%`,
-      `%${searchTerm}%`,
-      `%${searchTerm}%`,
-    ];
+    const params: (string | number)[] = [];
 
-    // Add filtering conditions dynamically
+    if (searchTerm) {
+      query += ` AND (
+        c.name LIKE ? OR c.family LIKE ? OR c.package_type LIKE ? 
+        OR c.nominal_value LIKE ? OR c.electrical_supply LIKE ? 
+        OR c.suppliers_name LIKE ? OR s.cabinet LIKE ? OR s.shelf LIKE ? 
+        OR s.drawer LIKE ?
+      )`;
+      params.push(
+        `%${searchTerm}%`,
+        `%${searchTerm}%`,
+        `%${searchTerm}%`,
+        `%${searchTerm}%`,
+        `%${searchTerm}%`,
+        `%${searchTerm}%`,
+        `%${searchTerm}%`,
+        `%${searchTerm}%`,
+        `%${searchTerm}%`
+      );
+    }
+
     if (name) {
       query += ` AND c.name LIKE ?`;
       params.push(`%${name}%`);
@@ -103,7 +105,12 @@ export const getComponents = async (req: Request, res: Response) => {
       params.push(`%${drawer}%`);
     }
 
-    // Add pagination if pageSize is provided
+    query += `
+      GROUP BY 
+        c.id, s.cabinet, s.shelf, s.drawer
+      ORDER BY c.id DESC
+    `;
+
     if (pageSize) {
       query += ` LIMIT ? OFFSET ?`;
       params.push(pageSize, offset);

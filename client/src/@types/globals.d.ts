@@ -36,15 +36,15 @@ interface Props {
 }
 
 type QueryComponent = {
-  name: string;
-  family: string;
-  package_type: string;
-  nominal_value: string;
-  electrical_supply: string;
+  names: string;
+  families: string;
+  package_types: string;
+  nominal_values: string;
+  electrical_supplies: string;
   suppliers_name: string;
-  cabinet: string;
-  shelf: string;
-  drawer: string;
+  cabinets: string;
+  shelves: string;
+  drawers: string;
   searchTerm: string;
   page: number;
   pageSize: number;
@@ -76,4 +76,24 @@ type Component = {
   drawer: string;
   shelf: string;
   images: Image[];
+};
+
+type Device = {
+  id?: string | number;
+  name: string;
+  purpose: string;
+  electrical_supply: string;
+  size: string;
+  available_quantity: string;
+  unit_cost: string;
+  images: Image[];
+};
+
+type QueryDevice = {
+  names: string;
+  electrical_supplies: string;
+  sizes: string;
+  searchTerm: string;
+  page: number;
+  pageSize: number;
 };

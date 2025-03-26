@@ -2,7 +2,6 @@ import axios from "axios";
 import { useElectronics } from "../../App";
 import { useEffect, useState } from "react";
 import Select from "react-select";
-import { FilterTerm } from "../../@types/component.types";
 import { FilterTerms } from "../../@types/component.types";
 
 type FilterBoxProps = {
@@ -79,15 +78,15 @@ const FilterBox = ({ searchQuery, setSearchQuery }: FilterBoxProps) => {
               value,
             }))}
           value={
-            searchQuery[field.key as keyof FilterTerm]
+            searchQuery[field.key as keyof FilterTerms]
               ? {
-                  label: searchQuery[field.key as keyof FilterTerm],
-                  value: searchQuery[field.key as keyof FilterTerm],
+                  label: searchQuery[field.key as keyof FilterTerms],
+                  value: searchQuery[field.key as keyof FilterTerms],
                 }
               : null
           }
           onChange={(selectedOption) =>
-            handleChange(field.key as keyof FilterTerm, selectedOption)
+            handleChange(field.key as keyof FilterTerms, selectedOption)
           }
           placeholder={field.placeholder}
         />
