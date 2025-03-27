@@ -2,11 +2,11 @@ import XLSX from "xlsx-js-style";
 import { RiFileExcelLine } from "react-icons/ri";
 import { useElectronics } from "../../App";
 
-type components = {
-  components: Component[];
+type devices = {
+  devices: Device[];
 };
 
-const ExportExcel = ({ components }: components) => {
+const ExportExcel = ({ devices }: devices) => {
   const { setAppStatus } = useElectronics();
 
   const handleExport = () => {
@@ -14,44 +14,17 @@ const ExportExcel = ({ components }: components) => {
     const worksheet = XLSX.utils.aoa_to_sheet([]);
 
     const Data = [
-      [
-        "სახელი",
-        "ოჯახის ტიპი",
-        "პაკეტის ტიპი",
-        "ნომინალური ღირებულება",
-        "კვება",
-        "ღირებულება",
-        "სხვა ხარჯი",
-        "რაოდენობა",
-        "კრიტიკული რაოდენობა",
-        "მომწოდებლის დასახელება",
-        "საკონტაქტო",
-        "მიღების თარიღი",
-        "ინვოისის ნომერი",
-        "კარადა",
-        "თარო",
-        "უჯრა",
-      ],
+      ["სახელი", "კვება", "ღირებულება", "რაოდენობა", "ზომა", "დანიშნულება"],
     ];
 
-    for (let component of components) {
+    for (const device of devices) {
       Data.push([
-        component.name,
-        component.family,
-        component.package_type,
-        component.nominal_value,
-        component.electrical_supply,
-        component.unit_cost.toString(),
-        component.other_cost.toString(),
-        component.available_quantity.toString(),
-        component.required_quantity.toString(),
-        component.suppliers_contact_details,
-        component.suppliers_contact_details,
-        component.receipt_date,
-        component.invoice_number,
-        component.cabinet,
-        component.shelf,
-        component.drawer,
+        device.name,
+        device.electrical_supply,
+        device.unit_cost.toString(),
+        device.available_quantity.toString(),
+        device.size,
+        device.purpose,
       ]);
     }
 
@@ -59,16 +32,6 @@ const ExportExcel = ({ components }: components) => {
     XLSX.utils.sheet_add_aoa(worksheet, Data);
 
     worksheet["!cols"] = [
-      { wch: 20 },
-      { wch: 20 },
-      { wch: 20 },
-      { wch: 20 },
-      { wch: 20 },
-      { wch: 20 },
-      { wch: 20 },
-      { wch: 20 },
-      { wch: 20 },
-      { wch: 20 },
       { wch: 20 },
       { wch: 20 },
       { wch: 20 },
@@ -105,7 +68,7 @@ const ExportExcel = ({ components }: components) => {
         };
 
         // Applying border if cell is in range
-        if (col <= 15 && row <= 1 + components.length) {
+        if (col <= 15 && row <= 1 + devices.length) {
           worksheet[cellRef].s = {
             ...worksheet[cellRef].s,
             border: {
@@ -145,10 +108,10 @@ const ExportExcel = ({ components }: components) => {
 
     // Create the workbook and append the worksheet
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Components");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Devices");
 
     // Export the file
-    XLSX.writeFile(workbook, "Components.xlsx");
+    XLSX.writeFile(workbook, "Devices.xlsx");
     setAppStatus("Success");
   };
 

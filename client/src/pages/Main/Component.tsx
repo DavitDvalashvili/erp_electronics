@@ -1,6 +1,6 @@
 import axios from "axios";
-//import Loading from "../Loading";
-//import ServerError from "../ServerError";
+import Loading from "../Loading";
+import ServerError from "../ServerError";
 import { useElectronics } from "../../App";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -43,7 +43,8 @@ export const defaultComponent: Component = {
 const Component = () => {
   const [component, setComponent] = useState(defaultComponent);
   const [images, setImages] = useState<Image[]>([]);
-  const { API_URL, setAppStatus, modal, setModal } = useElectronics();
+  const { API_URL, appStatus, setAppStatus, modal, setModal } =
+    useElectronics();
   const { id } = useParams();
 
   const getComponent = async () => {
@@ -70,11 +71,14 @@ const Component = () => {
     setImages(component.images);
   }, [component]);
 
+  if (appStatus === "Server Error") return <ServerError />;
+  if (appStatus === "Loading") return <Loading />;
+
   return (
     <section className="py-[4rem] px-[5.6rem] w-full h-screen  font-firago font-feature  overflow-y-scroll">
       <div className="grid grid-cols-3 gap-[3rem]">
         <div className="col-span-1 h-fit ">
-          <SwiperComponent images={images} />
+          <SwiperComponent images={images} type="component" />
         </div>
         <div
           className="col-span-2  flex flex-col gap-[3rem] font-medium text-textColor 
@@ -245,7 +249,10 @@ const Component = () => {
         />
       )}
       {modal === "update_component_quantity" && (
-        <UpdateQuantity currentComponent={component} />
+        <UpdateQuantity
+          currentComponent={component}
+          setCurrentComponent={setComponent}
+        />
       )}
     </section>
   );

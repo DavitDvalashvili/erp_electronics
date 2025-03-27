@@ -2,16 +2,12 @@ import { MdKeyboardArrowLeft } from "react-icons/md";
 import { MdKeyboardArrowRight } from "react-icons/md";
 
 type pagination = {
-  searchQuery: QueryComponent;
-  setSearchQuery: (query: QueryComponent) => void;
-  components: Component[];
+  searchQuery: QueryDevice;
+  setSearchQuery: (query: QueryDevice) => void;
+  devices: Device[];
 };
 
-const Pagination = ({
-  searchQuery,
-  setSearchQuery,
-  components,
-}: pagination) => {
+const Pagination = ({ searchQuery, setSearchQuery, devices }: pagination) => {
   return (
     <div className="flex items-center justify-start gap-8">
       <div className="flex gap-4">
@@ -28,14 +24,12 @@ const Pagination = ({
           <MdKeyboardArrowLeft />
         </div>
         {Array.from(
-          { length: Math.ceil(components.length / searchQuery.pageSize) },
+          { length: Math.ceil(devices.length / searchQuery.pageSize) },
           (_, i) => i + 1
         )
           .filter((page) => {
             const currentPage = searchQuery.page;
-            const totalPages = Math.ceil(
-              components.length / searchQuery.pageSize
-            );
+            const totalPages = Math.ceil(devices.length / searchQuery.pageSize);
 
             if (currentPage <= 2) {
               return page <= 5;
@@ -71,7 +65,7 @@ const Pagination = ({
           onClick={() => {
             if (
               searchQuery.page <
-              Math.ceil(components.length / searchQuery.pageSize)
+              Math.ceil(devices.length / searchQuery.pageSize)
             ) {
               setSearchQuery({ ...searchQuery, page: searchQuery.page + 1 });
             }
@@ -95,10 +89,10 @@ const Pagination = ({
         className="w-[5rem] h-[4rem] rounded-default border-[0.05rem] border-bgColor 
              text-[1.8rem] font-medium focus:outline-none cursor-pointer bg-transparent"
       >
-        <option value={10}>10</option>
-        <option value={20}>20</option>
-        <option value={50}>50</option>
-        <option value={100}>100</option>
+        <option value={4}>4</option>
+        <option value={8}>8</option>
+        <option value={12}>12</option>
+        <option value={16}>16</option>
       </select>
     </div>
   );

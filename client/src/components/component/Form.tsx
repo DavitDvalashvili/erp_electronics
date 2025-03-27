@@ -33,7 +33,9 @@ const Form = ({ setFormData, formData, submitFunction, type }: Form) => {
       className="flex flex-col gap-2 text-textColor text-[1.4rem]"
     >
       <div className="flex flex-col gap-1">
-        <label htmlFor="name">კომპონენტის დასახელება</label>
+        <label htmlFor="name">
+          კომპონენტის დასახელება <span className="text-errorRed">*</span>
+        </label>
         <input
           type="text"
           name="name"
@@ -105,7 +107,9 @@ const Form = ({ setFormData, formData, submitFunction, type }: Form) => {
       </div>
       <div className="flex gap-2 items-center">
         <div className="flex flex-col gap-1 w-full">
-          <label htmlFor="available_quantity">ხელმისაწვდომი რაოდენობა*</label>
+          <label htmlFor="available_quantity">
+            ხელმისაწვდომი რაოდენობა <span className="text-errorRed">*</span>
+          </label>
           <input
             type="number"
             name="available_quantity"
@@ -119,7 +123,9 @@ const Form = ({ setFormData, formData, submitFunction, type }: Form) => {
           />
         </div>
         <div className="flex flex-col gap-1 w-full">
-          <label htmlFor="required_quantity">მინ. საჭირო რაოდენობა*</label>
+          <label htmlFor="required_quantity">
+            მინ. საჭირო რაოდენობა <span className="text-errorRed">*</span>
+          </label>
           <input
             type="number"
             name="required_quantity"

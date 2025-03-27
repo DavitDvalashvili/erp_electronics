@@ -21,10 +21,14 @@ type ResponseStatus = {
 
 type Modal =
   | "add_component"
+  | "add_device"
   | "update_component"
+  | "update_device"
   | "update_component_quantity"
+  | "update_device_quantity"
   | "update_position"
   | "delete_component"
+  | "delete_device"
   | "add_image"
   | "delete_image"
   | "view_pdf"
@@ -84,8 +88,8 @@ type Device = {
   purpose: string;
   electrical_supply: string;
   size: string;
-  available_quantity: string;
-  unit_cost: string;
+  available_quantity: string | number;
+  unit_cost: string | number;
   images: Image[];
 };
 

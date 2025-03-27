@@ -46,7 +46,7 @@ const Components = () => {
 
   const [searchQuery, setSearchQuery] = useState<QueryComponent>(defaultQuery);
   const [showFilter, setShowFilter] = useState<boolean>(false);
-  let [queryString, setQuerystring] = useState("");
+  const [queryString, setQuerystring] = useState("");
   const [currentComponent, setCurrentComponent] =
     useState<Component>(defaultComponent);
 
@@ -152,7 +152,7 @@ const Components = () => {
                       ? component.images[0]?.image_url.startsWith("blob:")
                         ? component.images[0]?.image_url
                         : `${API_URL}/files/images/${component.images[0]?.image_url}`
-                      : "/defaultComponent.png"
+                      : "/component.png"
                   }
                   alt="component"
                   className="h-[15rem] w-[15rem] rounded-[0.5rem]"
@@ -236,7 +236,10 @@ const Components = () => {
 
       {modal === "add_component" && <AddComponent />}
       {modal === "update_component_quantity" && (
-        <UpdateQuantity currentComponent={currentComponent} />
+        <UpdateQuantity
+          currentComponent={currentComponent}
+          setCurrentComponent={setCurrentComponent}
+        />
       )}
 
       {modal === "update_position" && (

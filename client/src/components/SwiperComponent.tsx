@@ -8,9 +8,10 @@ import { useElectronics } from "../App";
 
 interface images {
   images: Image[];
+  type: "device" | "component";
 }
 
-const SwiperComponent = ({ images }: images) => {
+const SwiperComponent = ({ images, type }: images) => {
   const { API_URL } = useElectronics();
 
   console.log(images);
@@ -33,7 +34,7 @@ const SwiperComponent = ({ images }: images) => {
                   ? image.image_url.startsWith("blob:")
                     ? image.image_url
                     : `${API_URL}/files/images/${image.image_url}`
-                  : "/defaultComponent.png"
+                  : `/${type}.png`
               }
               className="max-h-[45.4rem]"
               alt="Component Image"

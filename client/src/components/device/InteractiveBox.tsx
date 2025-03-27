@@ -5,8 +5,8 @@ import axios from "axios";
 import { useElectronics } from "../../App";
 
 type InteractiveBox = {
-  searchQuery: QueryComponent;
-  setSearchQuery: (query: QueryComponent) => void;
+  searchQuery: QueryDevice;
+  setSearchQuery: (query: QueryDevice) => void;
 };
 
 export const InteractiveBox = ({
@@ -14,14 +14,14 @@ export const InteractiveBox = ({
   setSearchQuery,
 }: InteractiveBox) => {
   const { API_URL } = useElectronics();
-  const [allComponents, setAllComponents] = useState<Component[]>([]);
+  const [allDevices, setAllDevices] = useState<Device[]>([]);
 
-  const getAllComponents = async () => {
+  const getAllDevices = async () => {
     await axios
-      .get(`${API_URL}/getComponents`)
+      .get(`${API_URL}/getDevices`)
       .then((res) => {
         if (res.status == 200) {
-          setAllComponents(res.data);
+          setAllDevices(res.data);
         }
       })
       .catch((error) => {
@@ -30,7 +30,7 @@ export const InteractiveBox = ({
   };
 
   useEffect(() => {
-    getAllComponents();
+    getAllDevices();
   }, []);
 
   return (
@@ -38,9 +38,9 @@ export const InteractiveBox = ({
       <Pagination
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        components={allComponents}
+        devices={allDevices}
       />
-      <ExportExcel components={allComponents} />
+      <ExportExcel devices={allDevices} />
     </div>
   );
 };

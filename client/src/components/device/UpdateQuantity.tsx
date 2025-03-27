@@ -4,9 +4,9 @@ import axios from "axios";
 import { useElectronics } from "../../App";
 import { useEffect } from "react";
 
-type updateComponent = {
-  currentComponent: Component;
-  setCurrentComponent: Dispatch<SetStateAction<Component>>;
+type updateDevice = {
+  currentDevice: Device;
+  setCurrentDevice: Dispatch<SetStateAction<Device>>;
 };
 
 type Quantity = {
@@ -21,11 +21,8 @@ const defaultQuantity = {
   updatedQuantity: "",
 };
 
-const UpdateQuantity = ({
-  currentComponent,
-  setCurrentComponent,
-}: updateComponent) => {
-  const { API_URL, setResponse, setComponents, components, setModal } =
+const UpdateQuantity = ({ currentDevice, setCurrentDevice }: updateDevice) => {
+  const { API_URL, setResponse, setDevices, devices, setModal } =
     useElectronics();
   const [quantity, setQuantity] = useState<Quantity>(defaultQuantity);
   const [newQuantity, setNewQuantity] = useState<number>(0);
@@ -35,7 +32,7 @@ const UpdateQuantity = ({
       setNewQuantity(Number(quantity.updatedQuantity));
     } else {
       setNewQuantity(
-        Number(currentComponent.available_quantity) +
+        Number(currentDevice.available_quantity) +
           (Number(quantity.increaseQuantity)
             ? Number(quantity.increaseQuantity)
             : 0) -
@@ -47,24 +44,20 @@ const UpdateQuantity = ({
   }, [quantity]);
 
   const updateQuantity = async () => {
-    const updatedComponent: Component = {
-      ...currentComponent,
+    const updatedDevice: Device = {
+      ...currentDevice,
       available_quantity: newQuantity,
     };
     await axios
-      .post(
-        `${API_URL}/updateComponent/${currentComponent.id}`,
-        updatedComponent
-      )
+      .post(`${API_URL}/updateDevice/${currentDevice.id}`, updatedDevice)
       .then((res) => {
         if (res.data.status === "updated") {
-          setComponents([
-            updatedComponent,
-            ...components.filter(
-              (component) => component.id !== updatedComponent.id
-            ),
+          setDevices([
+            updatedDevice,
+            ...devices.filter((device) => device.id !== updatedDevice.id),
           ]);
-          setCurrentComponent(updatedComponent);
+          console.log(res.data);
+          setCurrentDevice(updatedDevice);
           setModal(null);
           setQuantity(defaultQuantity);
         }
@@ -77,7 +70,7 @@ const UpdateQuantity = ({
 
   const handleSubmit = (e: React.FocusEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (currentComponent.available_quantity == newQuantity) {
+    if (currentDevice.available_quantity == newQuantity) {
       return;
     }
     if (newQuantity < 0) {
@@ -92,7 +85,7 @@ const UpdateQuantity = ({
         <div className="flex justify-between items-center">
           <span>რაოდენობა</span>
           <span className="text-bgColor font-bold ">
-            {currentComponent.available_quantity}
+            {currentDevice.available_quantity}
           </span>
         </div>
         <div className="flex justify-between items-center">
