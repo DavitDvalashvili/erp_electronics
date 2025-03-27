@@ -7,6 +7,7 @@ import { BiImageAdd } from "react-icons/bi";
 import { MdOutlineAddAPhoto } from "react-icons/md";
 import { Modal } from "./Modal";
 import Webcam from "react-webcam";
+import { useLocation } from "react-router-dom";
 
 interface images {
   images: Image[];
@@ -22,6 +23,8 @@ const AddImage = ({ images, setImages }: images) => {
   const [webCamMode, setWebCamMode] = useState<boolean>(false);
   const videoRef = useRef<Webcam>(null);
   const Id = useParams().id as string | number;
+  const location = useLocation();
+  const pathname = location.pathname.slice(1).split("/")[0] as string;
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -37,7 +40,7 @@ const AddImage = ({ images, setImages }: images) => {
       const formData = new FormData();
       formData.append("image", file);
       await axios
-        .post(`${API_URL}/addImage?id=${Id}`, formData)
+        .post(`${API_URL}/addImage?id=${Id}&type=${pathname}`, formData)
         .then((res) => {
           if (res.data.status === "inserted") {
             if (images[0].image_id === null) {

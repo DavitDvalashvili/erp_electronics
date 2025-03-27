@@ -5,6 +5,9 @@ import {
   updateDevice,
   deleteDevice,
   getFilterTerms,
+  getComponent,
+  deleteComponent,
+  getComponentName,
 } from "../controllers/device.controller";
 import { Router } from "express";
 
@@ -16,5 +19,8 @@ deviceRouter.post("/addDevice", addDevice);
 deviceRouter.post("/updateDevice/:id", updateDevice);
 deviceRouter.delete("/deleteDevice/:id", deleteDevice);
 deviceRouter.get("/device/getFilterTerms", getFilterTerms);
+deviceRouter.get("/device/getComponent/:deviceId", getComponent);
+deviceRouter.delete("/device/deleteComponent/:Id", deleteComponent);
+deviceRouter.get("/device/getComponentName", getComponentName);
 
 export default deviceRouter;

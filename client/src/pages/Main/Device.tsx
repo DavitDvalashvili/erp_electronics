@@ -13,6 +13,8 @@ import { GrUpdate } from "react-icons/gr";
 import UpdateQuantity from "../../components/device/UpdateQuantity";
 import ImageBox from "../../components/ImageBox";
 import DeleteDevice from "../../components/device/DeleteDevice";
+import { Components } from "../../components/device/Components";
+import { FastenComponent } from "../../components/device/FastenComponent";
 
 export const defaultDevice: Device = {
   id: "",
@@ -55,6 +57,8 @@ const Device = () => {
   useEffect(() => {
     setImages(device.images);
   }, [device]);
+
+  console.log(device.images);
 
   if (appStatus === "Server Error") return <ServerError />;
   if (appStatus === "Loading") return <Loading />;
@@ -110,7 +114,6 @@ const Device = () => {
                   }}
                 >
                   <span>წაშლა</span>
-
                   <MdDeleteOutline className="h-[2.4rem] mt-[-0.5rem]" />
                 </button>
               </div>
@@ -129,10 +132,10 @@ const Device = () => {
                             border border-green text-green font-bold hover:bg-green transition duration-300 hover:text-white 
                             text-[1.3rem]"
                   onClick={() => {
-                    setModal("update_position");
+                    setModal("fasten_components");
                   }}
                 >
-                  <span>ადგილის განახლება</span>
+                  <span>კომპონენტის მიმბმა</span>
 
                   <ImDrawer className="h-[2.4rem] mt-[-0.5rem]" />
                 </button>
@@ -151,6 +154,24 @@ const Device = () => {
               </div>
             </div>
           </div>
+          <div className="grid grid-cols-4">
+            <div
+              className="rounded-default flex flex-col justify-center items-center gap-5  border-2 
+                    border-bgColor cursor-pointer p-4 text-textColor ml-auto"
+              onClick={() => {
+                setModal("view_components");
+              }}
+            >
+              <img
+                src="/component.png"
+                alt="component"
+                className="w-[6rem] h-[6rem]"
+              />
+              <span className=" text-[1.4rem] text-center">
+                დაკავშირებული კომპონენტები
+              </span>
+            </div>
+          </div>
         </div>
       </div>
       <ImageBox images={images} setImages={setImages} />
@@ -158,8 +179,9 @@ const Device = () => {
         <UpdateDevice device={device} setDevice={setDevice} />
       )}
       {modal === "delete_device" && <DeleteDevice device={device} />}
-      {modal === "update_device_quantity" && (
-        <UpdateQuantity currentDevice={device} setCurrentDevice={setDevice} />
+      {modal === "view_components" && <Components deviceId={device.id} />}
+      {modal === "fasten_components" && (
+        <FastenComponent deviceId={device.id} />
       )}
     </section>
   );

@@ -25,6 +25,7 @@ const DeleteDevice = ({ device }: DeleteDevice) => {
         console.log(error);
       });
   };
+
   return (
     <Modal title="მოწყობილობის წაშლა">
       <p className="text-[1.6rem] text-textColor pb-4">

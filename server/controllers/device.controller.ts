@@ -94,14 +94,16 @@ export const getDevice = async (req: Request, res: Response) => {
     const query = `
         SELECT 
           d.*, 
-          JSON_ARRAYAGG(
-            JSON_OBJECT(
-              'image_url', i.image_url,
-              'image_id', i.id
-            )
-          ) AS images
+           COALESCE(
+           JSON_ARRAYAGG(
+           JSON_OBJECT(
+            'image_url', i.image_url,
+            'image_id', i.id
+          )), 
+        JSON_ARRAY()
+      ) AS images
         FROM devices d
-        LEFT JOIN images i ON i.component_id = d.id
+        LEFT JOIN images i ON i.device_id = d.id
         WHERE d.id = ?
         GROUP BY d.id
       `;
@@ -296,21 +298,21 @@ export const deleteDevice = async (req: Request, res: Response) => {
     const result = await conn.query(query, [id]);
 
     if (result.affectedRows === 0) {
-      res.status(404).send({ message: "device not found." });
+      status = {
+        status: "delete_error",
+        message: "მოწყობილობა ვერ წაიშალა",
+      };
+      res.send(status);
       return;
     } else {
       status = {
         status: "deleted",
-        message: "Device deleted successfully.",
+        message: "მოწყობილობა წარმატებით წაიშალა",
       };
       res.send(status);
     }
   } catch (err) {
-    status = {
-      status: "delete_error",
-      message: "An error occurred while deleting device.",
-    };
-    res.status(500).send(status);
+    res.status(500).json(err);
     console.log(err);
   } finally {
     if (conn) await conn.release();
@@ -339,6 +341,97 @@ export const getFilterTerms = async (req: Request, res: Response) => {
   } catch (error) {
     console.log(error);
     res.status(500).send({ "An error filter terms": error });
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
+export const getComponent = async (req: Request, res: Response) => {
+  type Component = {
+    name: string;
+    available_quantity: string | number;
+    quantity_per_device: string | number;
+    id: string | number;
+  };
+
+  let conn;
+  const deviceId = req.params.deviceId as string;
+
+  try {
+    conn = await createConnection();
+
+    const query = `
+        SELECT dc.id, c.name, c.available_quantity, dc.quantity_per_device FROM devices d
+        JOIN device_components dc ON d.id = dc.device_id
+        JOIN components c ON c.id = dc.component_id
+        WHERE d.id = ?
+        GROUP BY dc.id
+      `;
+
+    const components: Component[] = await conn.query(query, [deviceId]);
+
+    res.send(components);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ error: "Error fetching components" });
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
+export const deleteComponent = async (req: Request, res: Response) => {
+  let conn;
+  const Id = req.params.Id as string;
+
+  let status: ResponseStatus;
+
+  try {
+    conn = await createConnection();
+    const query = `DELETE FROM device_components WHERE id = ?`;
+
+    const result = await conn.query(query, [Id]);
+
+    if (result.affectedRows === 0) {
+      status = {
+        status: "delete_error",
+        message: "კომპონენტი ვერ წაიშალა",
+      };
+      res.send(status);
+      return;
+    } else {
+      status = {
+        status: "deleted",
+        message: "კომპონენტი წარმატებით წაიშალა",
+      };
+      res.send(status);
+    }
+  } catch (err) {
+    res.status(500).send({ error: err });
+    console.log(err);
+  } finally {
+    if (conn) await conn.release();
+  }
+};
+
+export const getComponentName = async (req: Request, res: Response) => {
+  type ComponentNme = {
+    name: string;
+    id: string | number;
+  };
+
+  let conn;
+
+  try {
+    conn = await createConnection();
+
+    const query = `SELECT c.id, c.name FROM components c;`;
+
+    const componentNames: ComponentNme[] = await conn.query(query);
+
+    res.send(componentNames);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ error: "Error fetching components" });
   } finally {
     if (conn) conn.release();
   }

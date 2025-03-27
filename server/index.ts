@@ -1,6 +1,7 @@
 import express from "express";
 import componentRouter from "./routes/component.route";
 import deviceRouter from "./routes/device.route";
+import fileRouter from "./routes/file.route";
 import cors from "cors";
 import path from "path";
 
@@ -26,6 +27,7 @@ app.use(
 
 app.use(componentRouter);
 app.use(deviceRouter);
+app.use(fileRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);

@@ -32,6 +32,8 @@ type Modal =
   | "add_image"
   | "delete_image"
   | "view_pdf"
+  | "view_components"
+  | "fasten_components"
   | null;
 
 interface Props {

@@ -14,8 +14,6 @@ interface images {
 const SwiperComponent = ({ images, type }: images) => {
   const { API_URL } = useElectronics();
 
-  console.log(images);
-
   return (
     <div className="rounded-default overflow-hidden ">
       <Swiper
