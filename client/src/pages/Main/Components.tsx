@@ -1,4 +1,4 @@
-import { CgComponents } from "react-icons/cg";
+import { RxComponent1 } from "react-icons/rx";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { MdFilterListAlt } from "react-icons/md";
 import { useElectronics } from "../../App";
@@ -13,25 +13,10 @@ import SearchBox from "../../components/component/SearchBox";
 import { Link } from "react-router-dom";
 import AddComponent from "../../components/component/AddComponent";
 import UpdateQuantity from "../../components/component/UpdateQuantity";
-import { defaultComponent } from "./Component";
+import { defaultComponent, defaultQuery } from "../../data/components";
 import ResultNotFound from "../../components/ResultNotFound";
 import UpdateStorage from "../../components/component/UpdateStorage";
 import { InteractiveBox } from "../../components/component/InteractiveBox";
-
-const defaultQuery: QueryComponent = {
-  names: "",
-  families: "",
-  package_types: "",
-  nominal_values: "",
-  electrical_supplies: "",
-  suppliers_name: "",
-  cabinets: "",
-  shelves: "",
-  drawers: "",
-  searchTerm: "",
-  page: 1,
-  pageSize: 10,
-};
 
 const Components = () => {
   const {
@@ -93,14 +78,14 @@ const Components = () => {
       <div className="fixed t-0 w-[calc(100vw-28.5rem)] xl:w-[calc(192rem-38.5rem)] bg-bgColorSecondary px-[5.6rem] pt-[4rem] pb-[3rem]">
         <div className="flex gap-8 ">
           <div className="bg-white rounded-default p-[1.2rem] flex gap-8 text-[1.8rem] font-bold items-center h-[5rem] w-fit ">
-            <CgComponents className="w-[3rem] h-[3rem]" />
+            <RxComponent1 className="w-[3rem] h-[3rem]" />
             <span>კომპონენტები</span>
           </div>
 
           <button
             className="bg-white rounded-default h-[5rem] text-[1.8rem] font-bold flex gap-8 items-center p-[1.2rem] cursor-pointer"
             onClick={() => {
-              setModal("add_component");
+              setModal("add");
             }}
           >
             <IoMdAddCircleOutline className="w-[2.5rem] h-[2.5rem]" />
@@ -134,7 +119,7 @@ const Components = () => {
       </div>
       {appStatus === "Loading" ? <Loading /> : null}
       {components.length === 0 ? (
-        <ResultNotFound />
+        <ResultNotFound name="კომპონენტი" />
       ) : (
         <div
           className={`grid grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-6 font-medium text-textColor 
@@ -152,10 +137,10 @@ const Components = () => {
                       ? component.images[0]?.image_url.startsWith("blob:")
                         ? component.images[0]?.image_url
                         : `${API_URL}/files/images/${component.images[0]?.image_url}`
-                      : "/component.png"
+                      : "/component.svg"
                   }
                   alt="component"
-                  className="h-[15rem] w-[15rem] rounded-[0.5rem]"
+                  className="h-[15rem] w-[18rem] rounded-[0.5rem]"
                 />
                 <h3>კომპონენტები</h3>
               </div>
@@ -197,7 +182,7 @@ const Components = () => {
                   font-bold border-green text-green hover:bg-green transition duration-300 hover:text-white border"
                   onClick={() => {
                     setCurrentComponent(component);
-                    setModal("update_component_quantity");
+                    setModal("update_quantity");
                   }}
                 >
                   <span>რაოდენობის განახლება</span>
@@ -234,8 +219,8 @@ const Components = () => {
         </div>
       )}
 
-      {modal === "add_component" && <AddComponent />}
-      {modal === "update_component_quantity" && (
+      {modal === "add" && <AddComponent />}
+      {modal === "update_quantity" && (
         <UpdateQuantity
           currentComponent={currentComponent}
           setCurrentComponent={setCurrentComponent}

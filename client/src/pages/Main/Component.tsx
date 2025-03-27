@@ -8,7 +8,7 @@ import SwiperComponent from "../../components/SwiperComponent";
 import UpdateComponent from "../../components/component/UpdateComponent";
 import { ImDrawer } from "react-icons/im";
 import { FaSortAmountUpAlt } from "react-icons/fa";
-import { MdDeleteOutline } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 import { GrUpdate } from "react-icons/gr";
 import DeleteComponent from "../../components/component/DeleteComponent";
 import UpdateStorage from "../../components/component/UpdateStorage";
@@ -16,29 +16,7 @@ import UpdateQuantity from "../../components/component/UpdateQuantity";
 import ImageBox from "../../components/ImageBox";
 import { MdOutlinePictureAsPdf } from "react-icons/md";
 import PdfViewer from "../../components/component/PdfViewer";
-
-export const defaultComponent: Component = {
-  id: "",
-  family: "",
-  name: "",
-  purpose: "",
-  package_type: "",
-  nominal_value: "",
-  electrical_supply: "",
-  unit_cost: "",
-  other_cost: "",
-  available_quantity: "",
-  required_quantity: "",
-  suppliers_name: "",
-  suppliers_contact_details: "",
-  receipt_date: "",
-  data_sheet: "",
-  invoice_number: "",
-  cabinet: "",
-  drawer: "",
-  shelf: "",
-  images: [],
-};
+import { defaultComponent } from "../../data/components";
 
 const Component = () => {
   const [component, setComponent] = useState(defaultComponent);
@@ -131,7 +109,7 @@ const Component = () => {
                             border border-textColor text-textColor font-bold hover:bg-textColor transition duration-300
                              hover:text-white text-[1.3rem]"
                   onClick={() => {
-                    setModal("update_component");
+                    setModal("update");
                   }}
                 >
                   <span>განახლება</span>
@@ -143,12 +121,12 @@ const Component = () => {
                             border border-errorRed text-errorRed font-bold hover:bg-errorRed transition duration-300
                             hover:text-white text-[1.3rem]"
                   onClick={() => {
-                    setModal("delete_component");
+                    setModal("delete");
                   }}
                 >
                   <span>წაშლა</span>
 
-                  <MdDeleteOutline className="h-[2.4rem] mt-[-0.5rem]" />
+                  <MdDelete className="h-[2.4rem] mt-[-0.5rem]" />
                 </button>
               </div>
             </div>
@@ -206,7 +184,7 @@ const Component = () => {
                             border border-green text-green font-bold hover:bg-green transition duration-300
                             hover:text-white text-[1.3rem]"
                   onClick={() => {
-                    setModal("update_component_quantity");
+                    setModal("update_quantity");
                   }}
                 >
                   <span>რაოდენობის განახლება</span>
@@ -236,19 +214,17 @@ const Component = () => {
       {modal === "view_pdf" && (
         <PdfViewer component={component} setComponent={setComponent} />
       )}
-      {modal === "update_component" && (
+      {modal === "update" && (
         <UpdateComponent component={component} setComponent={setComponent} />
       )}
-      {modal === "delete_component" && (
-        <DeleteComponent component={component} />
-      )}
+      {modal === "delete" && <DeleteComponent component={component} />}
       {modal === "update_position" && (
         <UpdateStorage
           currentComponent={component}
           setCurrentComponent={setComponent}
         />
       )}
-      {modal === "update_component_quantity" && (
+      {modal === "update_quantity" && (
         <UpdateQuantity
           currentComponent={component}
           setCurrentComponent={setComponent}

@@ -20,15 +20,11 @@ type ResponseStatus = {
 };
 
 type Modal =
-  | "add_component"
-  | "add_device"
-  | "update_component"
-  | "update_device"
-  | "update_component_quantity"
-  | "update_device_quantity"
+  | "add"
+  | "update"
+  | "update_quantity"
   | "update_position"
-  | "delete_component"
-  | "delete_device"
+  | "delete"
   | "add_image"
   | "delete_image"
   | "view_pdf"

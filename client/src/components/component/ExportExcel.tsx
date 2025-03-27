@@ -34,7 +34,7 @@ const ExportExcel = ({ components }: components) => {
       ],
     ];
 
-    for (let component of components) {
+    for (const component of components) {
       Data.push([
         component.name,
         component.family,

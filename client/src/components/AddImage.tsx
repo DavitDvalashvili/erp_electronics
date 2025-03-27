@@ -74,8 +74,6 @@ const AddImage = ({ images, setImages }: images) => {
     if (videoRef.current) {
       const imageSrc = videoRef.current.getScreenshot();
       if (imageSrc) {
-        setPreviewUrl(imageSrc);
-
         // Convert base64 image to a Blob
         const byteString = atob(imageSrc.split(",")[1]);
         const mimeString = imageSrc.split(",")[0].split(":")[1].split(";")[0];
@@ -88,7 +86,7 @@ const AddImage = ({ images, setImages }: images) => {
 
         const blob = new Blob([arrayBuffer], { type: mimeString });
         const photo = new File([blob], "photo.jpg", { type: mimeString });
-
+        setPreviewUrl(URL.createObjectURL(photo));
         setFile(photo);
       }
       setWebCamMode(false);

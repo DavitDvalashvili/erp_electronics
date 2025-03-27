@@ -1,6 +1,6 @@
 import { useElectronics } from "../../App";
 import { Modal } from "../Modal";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Dispatch, SetStateAction } from "react";
@@ -17,7 +17,7 @@ const PdfViewer = ({ component, setComponent }: pdfViewer) => {
   const { API_URL, setResponse } = useElectronics();
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    let file = event.target.files?.[0];
+    const file = event.target.files?.[0];
     if (file) {
       const formData = new FormData();
       formData.append("document", file);

@@ -6,26 +6,16 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import SwiperComponent from "../../components/SwiperComponent";
 import UpdateDevice from "../../components/device/UpdateDevice";
-import { ImDrawer } from "react-icons/im";
+import { IoIosLink } from "react-icons/io";
 import { FaSortAmountUpAlt } from "react-icons/fa";
-import { MdDeleteOutline } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 import { GrUpdate } from "react-icons/gr";
 import UpdateQuantity from "../../components/device/UpdateQuantity";
 import ImageBox from "../../components/ImageBox";
 import DeleteDevice from "../../components/device/DeleteDevice";
 import { Components } from "../../components/device/Components";
 import { FastenComponent } from "../../components/device/FastenComponent";
-
-export const defaultDevice: Device = {
-  id: "",
-  name: "",
-  purpose: "",
-  electrical_supply: "",
-  size: "",
-  unit_cost: "",
-  available_quantity: "",
-  images: [],
-};
+import { defaultDevice } from "../../data/devices";
 
 const Device = () => {
   const [device, setDevice] = useState<Device>(defaultDevice);
@@ -57,8 +47,6 @@ const Device = () => {
   useEffect(() => {
     setImages(device.images);
   }, [device]);
-
-  console.log(device.images);
 
   if (appStatus === "Server Error") return <ServerError />;
   if (appStatus === "Loading") return <Loading />;
@@ -95,10 +83,10 @@ const Device = () => {
               <div className="grid grid-cols-2 gap-4 mt-4">
                 <button
                   className="w-full h-[4rem] rounded-default flex justify-center items-center gap-4
-                            border border-textColor text-textColor font-bold hover:bg-textColor transition duration-300
+                            border border-green text-green font-bold hover:bg-green  transition duration-300
                              hover:text-white text-[1.3rem]"
                   onClick={() => {
-                    setModal("update_device");
+                    setModal("update");
                   }}
                 >
                   <span>განახლება</span>
@@ -107,14 +95,15 @@ const Device = () => {
                 </button>
                 <button
                   className="w-full h-[4rem] rounded-default flex justify-center items-center gap-4
-                            border border-errorRed text-errorRed font-bold hover:bg-errorRed transition duration-300
+                            border border-green text-green font-bold hover:bg-green transition duration-300
                             hover:text-white text-[1.3rem]"
                   onClick={() => {
-                    setModal("delete_device");
+                    setModal("update_quantity");
                   }}
                 >
-                  <span>წაშლა</span>
-                  <MdDeleteOutline className="h-[2.4rem] mt-[-0.5rem]" />
+                  <span>რაოდენობის განახლება</span>
+
+                  <FaSortAmountUpAlt className="h-[2.4rem] mt-[-0.5rem]" />
                 </button>
               </div>
             </div>
@@ -129,7 +118,7 @@ const Device = () => {
               <div className="grid grid-cols-2 gap-4 mt-4">
                 <button
                   className="w-full h-[4rem] rounded-default flex justify-center items-center gap-4
-                            border border-green text-green font-bold hover:bg-green transition duration-300 hover:text-white 
+                            border border-textColor text-textColor font-bold hover:bg-textColor  transition duration-300 hover:text-white 
                             text-[1.3rem]"
                   onClick={() => {
                     setModal("fasten_components");
@@ -137,19 +126,18 @@ const Device = () => {
                 >
                   <span>კომპონენტის მიმბმა</span>
 
-                  <ImDrawer className="h-[2.4rem] mt-[-0.5rem]" />
+                  <IoIosLink className="text-[1.6rem] font-bold" />
                 </button>
                 <button
                   className="w-full h-[4rem] rounded-default flex justify-center items-center gap-4
-                            border border-green text-green font-bold hover:bg-green transition duration-300
+                            border border-errorRed text-errorRed font-bold hover:bg-errorRed transition duration-300
                             hover:text-white text-[1.3rem]"
                   onClick={() => {
-                    setModal("update_device_quantity");
+                    setModal("delete");
                   }}
                 >
-                  <span>რაოდენობის განახლება</span>
-
-                  <FaSortAmountUpAlt className="h-[2.4rem] mt-[-0.5rem]" />
+                  <span>წაშლა</span>
+                  <MdDelete className="h-[2.4rem] mt-[-0.5rem]" />
                 </button>
               </div>
             </div>
@@ -163,7 +151,7 @@ const Device = () => {
               }}
             >
               <img
-                src="/component.png"
+                src="/component.svg"
                 alt="component"
                 className="w-[6rem] h-[6rem]"
               />
@@ -175,13 +163,16 @@ const Device = () => {
         </div>
       </div>
       <ImageBox images={images} setImages={setImages} />
-      {modal === "update_device" && (
+      {modal === "update" && (
         <UpdateDevice device={device} setDevice={setDevice} />
       )}
-      {modal === "delete_device" && <DeleteDevice device={device} />}
+      {modal === "delete" && <DeleteDevice device={device} />}
       {modal === "view_components" && <Components deviceId={device.id} />}
       {modal === "fasten_components" && (
         <FastenComponent deviceId={device.id} />
+      )}
+      {modal === "update_quantity" && (
+        <UpdateQuantity currentDevice={device} setCurrentDevice={setDevice} />
       )}
     </section>
   );

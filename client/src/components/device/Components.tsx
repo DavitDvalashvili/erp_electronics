@@ -3,7 +3,6 @@ import { useElectronics } from "../../App";
 import axios from "axios";
 import { useState } from "react";
 import { useEffect } from "react";
-import { MdDeleteOutline } from "react-icons/md";
 
 type DeviceId = {
   deviceId: string | number | undefined;
@@ -101,7 +100,6 @@ export const Components = ({ deviceId }: DeviceId) => {
                     }}
                   >
                     <span>წაშლა</span>
-                    <MdDeleteOutline className="h-[2.4rem] mt-[-0.2rem]" />
                   </button>
                 </td>
               </tr>

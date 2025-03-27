@@ -1,5 +1,5 @@
-import { CgComponents } from "react-icons/cg";
-import { PiDeviceMobileSpeakerFill } from "react-icons/pi";
+import { RxComponent1 } from "react-icons/rx";
+import { TbDeviceIpadBolt } from "react-icons/tb";
 import { IoMdNotifications } from "react-icons/io";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -14,7 +14,7 @@ const NavigationLayout = () => {
   const pathname = location.pathname;
 
   useEffect(() => {
-    setActivePage(pathname.slice(1));
+    setActivePage(pathname.slice(1).split("/")[0]);
   }, [pathname]);
 
   return (
@@ -24,7 +24,7 @@ const NavigationLayout = () => {
     >
       <div>
         <img
-          src="/Logical_systems.png"
+          src="/lsc.png"
           alt="logical_system_company"
           className="h-[12rem] w-[15rem] rounded-default shadow-lg"
         />
@@ -33,17 +33,17 @@ const NavigationLayout = () => {
         <ul className="text-textColor text-[2rem] font-bold flex flex-col gap-[6rem]">
           <Link to="/components">
             <li
-              className={`flex gap-8 py-4 rounded-default px-[3rem] xl:px-[6rem] ${activePage === "components" ? "bg-bgColor text-white" : "text-textColor"}`}
+              className={`flex gap-8 py-4 rounded-default px-[3rem] xl:px-[6rem] ${activePage === "components" || activePage === "component" ? "bg-bgColor text-white" : "text-textColor"}`}
             >
-              <CgComponents className="w-[3rem] h-[3rem]" />
+              <RxComponent1 className="w-[3rem] h-[3rem]" />
               <span>კომპონენტები</span>
             </li>
           </Link>
           <Link to="/devices">
             <li
-              className={`flex gap-8 py-4 rounded-default px-[3rem] xl:px-[6rem] ${activePage === "devices" ? "bg-bgColor text-white" : "text-textColor"}`}
+              className={`flex gap-8 py-4 rounded-default px-[3rem] xl:px-[6rem] ${activePage === "devices" || activePage === "device" ? "bg-bgColor text-white" : "text-textColor"}`}
             >
-              <PiDeviceMobileSpeakerFill className="w-[3rem] h-[3rem]" />
+              <TbDeviceIpadBolt className="w-[3rem] h-[3rem]" />
               <span>მოწყობილობები</span>
             </li>
           </Link>

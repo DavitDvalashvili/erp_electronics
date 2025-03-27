@@ -1,4 +1,3 @@
-import { MdDeleteOutline } from "react-icons/md";
 import { BiImageAdd } from "react-icons/bi";
 import { Dispatch, SetStateAction, useState } from "react";
 import AddImage from "./AddImage";
@@ -44,7 +43,6 @@ const ImageBox = ({ images, setImages }: images) => {
               }}
             >
               <span>წაშლა</span>
-              <MdDeleteOutline className="h-[2.4rem] mt-[-0.5rem]" />
             </button>
           </div>
         ))}

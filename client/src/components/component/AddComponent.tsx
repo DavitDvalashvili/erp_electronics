@@ -1,4 +1,4 @@
-import { defaultComponent } from "../../pages/Main/Component";
+import { defaultComponent } from "../../data/components";
 import { Modal } from "../Modal";
 import Form from "./Form";
 import axios from "axios";

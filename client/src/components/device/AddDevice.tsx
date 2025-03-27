@@ -3,7 +3,7 @@ import Form from "./Form";
 import axios from "axios";
 import { useElectronics } from "../../App";
 import { useState } from "react";
-import { defaultDevice } from "../../pages/Main/Device";
+import { defaultDevice } from "../../data/devices";
 
 const AddComponent = () => {
   const [formData, setFormData] = useState<Device>(defaultDevice);

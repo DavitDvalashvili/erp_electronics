@@ -1,4 +1,4 @@
-import { CgComponents } from "react-icons/cg";
+import { TbDeviceIpadBolt } from "react-icons/tb";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { MdFilterListAlt } from "react-icons/md";
 import { useElectronics } from "../../App";
@@ -12,18 +12,9 @@ import SearchBox from "../../components/device/SearchBox";
 import { Link } from "react-router-dom";
 import AddDevice from "../../components/device/AddDevice";
 import UpdateQuantity from "../../components/device/UpdateQuantity";
-import { defaultDevice } from "./Device";
+import { defaultDevice, defaultQuery } from "../../data/devices";
 import ResultNotFound from "../../components/ResultNotFound";
 import { InteractiveBox } from "../../components/device/InteractiveBox";
-
-const defaultQuery: QueryDevice = {
-  names: "",
-  electrical_supplies: "",
-  sizes: "",
-  searchTerm: "",
-  page: 1,
-  pageSize: 4,
-};
 
 const Devices = () => {
   const {
@@ -84,14 +75,14 @@ const Devices = () => {
       <div className="fixed t-0 w-[calc(100vw-28.5rem)] xl:w-[calc(192rem-38.5rem)] bg-bgColorSecondary px-[5.6rem] pt-[4rem] pb-[3rem]">
         <div className="flex gap-8 ">
           <div className="bg-white rounded-default p-[1.2rem] flex gap-8 text-[1.8rem] font-bold items-center h-[5rem] w-fit ">
-            <CgComponents className="w-[3rem] h-[3rem]" />
+            <TbDeviceIpadBolt className="w-[3rem] h-[3rem]" />
             <span>მოწყობილობები</span>
           </div>
 
           <button
             className="bg-white rounded-default h-[5rem] text-[1.8rem] font-bold flex gap-8 items-center p-[1.2rem] cursor-pointer"
             onClick={() => {
-              setModal("add_device");
+              setModal("add");
             }}
           >
             <IoMdAddCircleOutline className="w-[2.5rem] h-[2.5rem]" />
@@ -125,7 +116,7 @@ const Devices = () => {
       </div>
       {appStatus === "Loading" ? <Loading /> : null}
       {devices.length === 0 ? (
-        <ResultNotFound />
+        <ResultNotFound name="მოწყობილობა" />
       ) : (
         <div
           className={`grid grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-6 font-medium text-textColor 
@@ -143,10 +134,10 @@ const Devices = () => {
                       ? device.images[0]?.image_url.startsWith("blob:")
                         ? device.images[0]?.image_url
                         : `${API_URL}/files/images/${device.images[0]?.image_url}`
-                      : "/device.png"
+                      : "/device.svg"
                   }
                   alt="component"
-                  className="h-[15rem] w-[15rem] rounded-[0.5rem]"
+                  className="h-[15rem] w-[18rem] rounded-[0.5rem]"
                 />
                 <h3>მოწყობილობები</h3>
               </div>
@@ -190,7 +181,7 @@ const Devices = () => {
                   font-bold border-green text-green hover:bg-green transition duration-300 hover:text-white border"
                 onClick={() => {
                   setCurrentDevice(device);
-                  setModal("update_device_quantity");
+                  setModal("update_quantity");
                 }}
               >
                 <span>რაოდენობის განახლება</span>
@@ -200,8 +191,8 @@ const Devices = () => {
           ))}
         </div>
       )}
-      {modal === "add_device" && <AddDevice />}
-      {modal === "update_device_quantity" && (
+      {modal === "add" && <AddDevice />}
+      {modal === "update_quantity" && (
         <UpdateQuantity
           currentDevice={currentDevice}
           setCurrentDevice={setCurrentDevice}

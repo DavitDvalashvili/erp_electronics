@@ -6,9 +6,9 @@ import { ResponseStatus } from "../types/type";
 export const getDevices = async (req: Request, res: Response) => {
   let conn;
 
-  const name = (req.query.name as string) || "";
-  const electrical_supply = (req.query.electrical_supply as string) || "";
-  const size = (req.query.size as string) || "";
+  const name = (req.query.names as string) || "";
+  const electrical_supply = (req.query.electrical_supplies as string) || "";
+  const size = (req.query.sizes as string) || "";
   const searchTerm = req.query.searchTerm as string;
   const page = parseInt(req.query.page as string) || 1;
   const pageSize = parseInt(req.query.pageSize as string);
@@ -117,9 +117,7 @@ export const getDevice = async (req: Request, res: Response) => {
     res.send(device);
   } catch (err) {
     console.log(err);
-    res
-      .status(500)
-      .send({ error: "An error occurred while fetching components." });
+    res.status(500).send({ error: "Error fetching components." });
   } finally {
     if (conn) conn.release();
   }
@@ -151,21 +149,11 @@ export const addDevice = async (req: Request, res: Response): Promise<void> => {
     conn = await createConnection();
 
     if (!name || !available_quantity) {
-      res.status(404).send({ message: "Empty required fields" });
-    }
-
-    let existingDevices = await conn.query(
-      `SELECT * FROM devices d WHERE d.name = ? `,
-      name
-    );
-
-    if (existingDevices.length > 0) {
       status = {
-        status: "insert_exists",
-        message: "Device already exists",
+        status: "insert_error",
+        message: "შეავსეტ ყველა სავალდებულო ველი",
       };
-      res.status(409).json(status);
-      return;
+      res.send(status);
     }
 
     const insertQuery = `
@@ -180,25 +168,21 @@ export const addDevice = async (req: Request, res: Response): Promise<void> => {
       .then(() => {
         status = {
           status: "inserted",
-          message: "Device inserted successfully",
+          message: "მოწყობილობა დაემატა წარმატებით",
         };
         res.send(status);
       })
       .catch((err) => {
         status = {
           status: "insert_error",
-          message: "An error occurred while adding device.",
+          message: "მოწყობილობა ვერ დაემატა",
         };
         res.send(status);
         console.log(err);
       });
   } catch (err) {
     console.log(err);
-    status = {
-      status: "insert_error",
-      message: "An error occurred while adding device.",
-    };
-    res.status(500).send(status);
+    res.status(500).json(err);
   } finally {
     if (conn) conn.release();
   }
@@ -239,9 +223,9 @@ export const updateDevice = async (req: Request, res: Response) => {
     if (existingDevice.length > 0) {
       status = {
         status: "update_exists",
-        message: "Device already exists",
+        message: "მოწყობილობა უკვე დარეგისტრირებულია",
       };
-      res.status(409).json(status);
+      res.send(status);
       return;
     }
 
@@ -261,25 +245,21 @@ export const updateDevice = async (req: Request, res: Response) => {
       .then(() => {
         status = {
           status: "updated",
-          message: "Device updated successfully",
+          message: "მოწყობილობა წარმატებით განახლდა",
         };
         res.send(status);
       })
       .catch((err) => {
         status = {
           status: "update_error",
-          message: "An error occurred while updating device.",
+          message: "მოწყობილობა ვერ განახლდა",
         };
         res.send(status);
         console.log(err);
       });
   } catch (err) {
     console.log(err);
-    status = {
-      status: "update_error",
-      message: "An error occurred while updating device.",
-    };
-    res.status(500).send(status);
+    res.status(500).json(err);
   } finally {
     if (conn) conn.release();
   }
@@ -432,6 +412,66 @@ export const getComponentName = async (req: Request, res: Response) => {
   } catch (err) {
     console.log(err);
     res.status(500).send({ error: "Error fetching components" });
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
+export const addComponents = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  let conn;
+  let status: ResponseStatus;
+
+  const { device_id, component_id, component_per_device } = req.query as {
+    device_id: string;
+    component_id: string;
+    component_per_device: string;
+  };
+
+  try {
+    conn = await createConnection();
+
+    let existingComponent = await conn.query(
+      `SELECT * FROM device_components dc WHERE device_id = ? AND component_id = ? `,
+      [device_id, component_id]
+    );
+
+    if (existingComponent.length > 0) {
+      status = {
+        status: "insert_exists",
+        message: "კომპონენტი უკვე არსებობს",
+      };
+      res.send(status);
+      return;
+    }
+
+    const insertQuery = `
+    INSERT INTO device_components 
+     (device_id, component_id, quantity_per_device) 
+      VALUES (?, ?, ?)
+    `;
+
+    await conn
+      .query(insertQuery, [device_id, component_id, component_per_device])
+      .then(() => {
+        status = {
+          status: "inserted",
+          message: "კომპონენტი წარმატებით დაემატა",
+        };
+        res.send(status);
+      })
+      .catch((err) => {
+        status = {
+          status: "insert_error",
+          message: "კომპონენტი ვერ დაემატა",
+        };
+        res.send(status);
+      });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
   } finally {
     if (conn) conn.release();
   }

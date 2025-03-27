@@ -32,7 +32,7 @@ const SwiperComponent = ({ images, type }: images) => {
                   ? image.image_url.startsWith("blob:")
                     ? image.image_url
                     : `${API_URL}/files/images/${image.image_url}`
-                  : `/${type}.png`
+                  : `/${type}.svg`
               }
               className="max-h-[45.4rem]"
               alt="Component Image"

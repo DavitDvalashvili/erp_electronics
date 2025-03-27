@@ -89,10 +89,10 @@ const Pagination = ({ searchQuery, setSearchQuery, devices }: pagination) => {
         className="w-[5rem] h-[4rem] rounded-default border-[0.05rem] border-bgColor 
              text-[1.8rem] font-medium focus:outline-none cursor-pointer bg-transparent"
       >
-        <option value={4}>4</option>
-        <option value={8}>8</option>
-        <option value={12}>12</option>
-        <option value={16}>16</option>
+        <option value={10}>10</option>
+        <option value={20}>20</option>
+        <option value={50}>50</option>
+        <option value={100}>100</option>
       </select>
     </div>
   );
