@@ -10,11 +10,18 @@ import Devices from "./pages/Main/Devices";
 import Device from "./pages/Main/Device";
 import Component from "./pages/Main/Component";
 import { create } from "zustand";
+import { NotificationPage } from "./pages/Main/NotificationPage";
 import "./App.css";
 import PageNotFound from "./pages/PageNotFound";
 
 type AppStatus = "Success" | "Loading" | "Server Error" | null;
 type Response = ResponseStatus | null;
+
+type Notification = {
+  id: string | number;
+  name: string;
+  status: string | number;
+};
 
 type UseElectronics = {
   API_URL: string;
@@ -28,6 +35,8 @@ type UseElectronics = {
   setComponents: (components: Component[]) => void;
   devices: Device[];
   setDevices: (devices: Device[]) => void;
+  notifications: Notification[];
+  setNotifications: (notification: Notification[]) => void;
 };
 
 export const useElectronics = create<UseElectronics>((set) => ({
@@ -42,6 +51,8 @@ export const useElectronics = create<UseElectronics>((set) => ({
   setComponents: (components: Component[]) => set({ components }),
   devices: [],
   setDevices: (devices: Device[]) => set({ devices }),
+  notifications: [],
+  setNotifications: (notifications: Notification[]) => set({ notifications }),
 }));
 
 function App() {
@@ -52,9 +63,9 @@ function App() {
           <Route path="/" element={<Navigate to="/components" replace />} />
           <Route path="/components" element={<Components />} />
           <Route path="/devices" element={<Devices />} />
-          {/* <Route path="/notification" element={<Notification />} /> */}
           <Route path="/device/:id" element={<Device />} />
           <Route path="/component/:id" element={<Component />} />
+          <Route path="/notification" element={<NotificationPage />} />
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>
