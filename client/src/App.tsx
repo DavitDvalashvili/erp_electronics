@@ -20,7 +20,7 @@ type Response = ResponseStatus | null;
 type Notification = {
   id: string | number;
   name: string;
-  status: string | number;
+  activeStatus: number | string;
 };
 
 type UseElectronics = {
