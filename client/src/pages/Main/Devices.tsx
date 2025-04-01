@@ -8,7 +8,7 @@ import Loading from "../Loading";
 import ServerError from "../ServerError";
 import FilterBox from "../../components/device/FilterBox";
 import { FaSortAmountUpAlt } from "react-icons/fa";
-import SearchBox from "../../components/device/SearchBox";
+import SearchBox from "../../components/SearchBox";
 import { Link } from "react-router-dom";
 import AddDevice from "../../components/device/AddDevice";
 import UpdateQuantity from "../../components/device/UpdateQuantity";
@@ -28,6 +28,7 @@ const Devices = () => {
   } = useElectronics();
 
   const [searchQuery, setSearchQuery] = useState<QueryDevice>(defaultQuery);
+  const [searchValue, setSearchValue] = useState<string>("");
   const [showFilter, setShowFilter] = useState<boolean>(false);
   const [queryString, setQuerystring] = useState("");
   const [currentDevice, setCurrentDevice] = useState<Device>(defaultDevice);
@@ -68,6 +69,19 @@ const Devices = () => {
     setShowFilter(!showFilter);
   };
 
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (searchQuery.searchTerm !== searchValue) {
+        setSearchQuery({
+          ...searchQuery,
+          searchTerm: searchValue,
+        });
+      }
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [searchValue]);
+
   if (appStatus === "Server Error") return <ServerError />;
 
   return (
@@ -90,8 +104,8 @@ const Devices = () => {
           </button>
 
           <SearchBox
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
+            searchValue={searchValue}
+            setSearchValue={setSearchValue}
           />
 
           <button
@@ -115,14 +129,14 @@ const Devices = () => {
         )}
       </div>
       {appStatus === "Loading" ? <Loading /> : null}
-      {devices.length === 0 ? (
+      {devices?.length === 0 ? (
         <ResultNotFound name="მოწყობილობა" />
       ) : (
         <div
           className={`grid grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-6 font-medium text-textColor 
           text-[1.4rem] px-[5.6rem] pb-[4rem] ${showFilter ? "mt-[23.8rem]" : "mt-[18rem]"} `}
         >
-          {devices.map((device, index) => (
+          {devices?.map((device, index) => (
             <div
               key={index}
               className="bg-white p-8 rounded-[1rem] overflow-hidden "

@@ -2,6 +2,9 @@ import { IoMdNotificationsOff } from "react-icons/io";
 import { useElectronics } from "../../App";
 import { IoMdNotifications } from "react-icons/io";
 import axios from "axios";
+import ServerError from "../ServerError";
+import Loading from "../Loading";
+import { useEffect } from "react";
 
 type Notification = {
   id: string | number;
@@ -10,7 +13,15 @@ type Notification = {
 };
 
 export const NotificationPage = () => {
-  const { notifications, setNotifications, setResponse } = useElectronics();
+  const {
+    setResponse,
+    appStatus,
+    setNotificationCount,
+    notifications,
+    setNotifications,
+    components,
+    setAppStatus,
+  } = useElectronics();
 
   const { API_URL } = useElectronics();
 
@@ -55,6 +66,36 @@ export const NotificationPage = () => {
       });
   };
 
+  const getNotifications = async () => {
+    setAppStatus("Loading");
+    await axios
+      .get(`${API_URL}/getNotification`)
+      .then((res) => {
+        if (res.status == 200) {
+          setNotifications(res.data);
+        }
+        setAppStatus("Success");
+      })
+      .catch((error) => {
+        console.log(error);
+        setAppStatus("Server Error");
+      });
+  };
+
+  useEffect(() => {
+    getNotifications();
+  }, [components]);
+
+  useEffect(() => {
+    setNotificationCount(
+      notifications.filter((notification) => notification.activeStatus === 1)
+        .length
+    );
+  }, [notifications, components]);
+
+  if (appStatus === "Loading") return <Loading />;
+  if (appStatus === "Server Error") return <ServerError />;
+
   return (
     <section className=" bg-green-500 h-screen w-full overflow-y-scroll font-firago font-feature">
       <div className="fixed t-0 w-[calc(100vw-28.5rem)] xl:w-[calc(192rem-38.5rem)] bg-bgColorSecondary px-[5.6rem] pt-[4rem] pb-[3rem]">
@@ -64,13 +105,13 @@ export const NotificationPage = () => {
             <span>შეტყობინებები</span>
           </div>
         </div>
-        {notifications.length == 0 && (
-          <div className="mt-[-9rem] flex flex-col gap-8 justify-center items-center  text-textColor font-bold text-[3rem] w-full h-screen">
-            <IoMdNotificationsOff className="w-[12rem] h-[12rem] text-errorRed" />
+        {notifications?.length === 0 && (
+          <div className="mt-[-9rem] flex flex-col gap-8 justify-center items-center  text-textColor font-medium text-[3rem] w-full h-screen">
+            <IoMdNotificationsOff className="w-[10rem] h-[10rem] text-errorRed" />
             <p>შეტყობინება არ მოიძებნა</p>
           </div>
         )}
-        {notifications.length > 0 && (
+        {notifications?.length > 0 && (
           <table className="table-auto  border-collapse text-[1.4rem] bg-white mt-8 mr-[20rem] rounded-default pb-8 overflow-hidden">
             <thead>
               <tr>

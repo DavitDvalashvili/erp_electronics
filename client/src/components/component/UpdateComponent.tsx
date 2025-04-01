@@ -12,13 +12,24 @@ type updateComponent = {
 
 const UpdateComponent = ({ component, setComponent }: updateComponent) => {
   const [formData, setFormData] = useState<Component>(component);
-  const { API_URL, setResponse, setModal } = useElectronics();
+  const {
+    API_URL,
+    setResponse,
+    setModal,
+    setNotificationCount,
+    NotificationCount,
+  } = useElectronics();
 
   const updateComponent = async () => {
     await axios
       .post(`${API_URL}/updateComponent/${component.id}`, formData)
       .then((res) => {
         if (res.data.status === "updated") {
+          if (formData.available_quantity < formData.required_quantity) {
+            setNotificationCount(NotificationCount + 1);
+          } else {
+            setNotificationCount(NotificationCount - 1);
+          }
           setComponent(formData);
           setResponse(res.data);
           setModal(null);

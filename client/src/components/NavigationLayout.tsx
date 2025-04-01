@@ -9,8 +9,7 @@ import { useElectronics } from "../App";
 type ActivePage = "components" | "devices" | "notification" | "todo" | string;
 
 const NavigationLayout = () => {
-  const { notifications } = useElectronics();
-  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const { NotificationCount } = useElectronics();
   const [activePage, setActivePage] = useState<ActivePage>("components");
 
   const location = useLocation();
@@ -19,14 +18,6 @@ const NavigationLayout = () => {
   useEffect(() => {
     setActivePage(pathname.slice(1).split("/")[0]);
   }, [pathname]);
-
-  useEffect(() => {
-    setUnreadCount(
-      notifications.filter(
-        (notification) => Number(notification.activeStatus) === 1
-      ).length
-    );
-  }, notifications);
 
   return (
     <aside
@@ -64,9 +55,9 @@ const NavigationLayout = () => {
             >
               <div className="relative">
                 <IoMdNotifications className="w-[3rem] h-[3rem]" />
-                {unreadCount > 0 && (
+                {NotificationCount > 0 && (
                   <span className="bg-errorRed absolute top-[-0.5rem] left-[1.5rem] px-3 rounded-full text-[1.2rem] text-white">
-                    {unreadCount}
+                    {NotificationCount}
                   </span>
                 )}
               </div>

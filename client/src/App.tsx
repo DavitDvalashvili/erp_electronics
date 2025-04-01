@@ -31,10 +31,12 @@ type UseElectronics = {
   setAppStatus: (appStatus: AppStatus) => void;
   modal: Modal;
   setModal: (modal: Modal) => void;
-  components: Component[];
+  components: Component[] | null;
   setComponents: (components: Component[]) => void;
-  devices: Device[];
+  devices: Device[] | null;
   setDevices: (devices: Device[]) => void;
+  NotificationCount: number;
+  setNotificationCount: (NotificationCount: number) => void;
   notifications: Notification[];
   setNotifications: (notification: Notification[]) => void;
 };
@@ -47,10 +49,13 @@ export const useElectronics = create<UseElectronics>((set) => ({
   setAppStatus: (appStatus: AppStatus) => set({ appStatus }),
   modal: null,
   setModal: (modal: Modal) => set({ modal }),
-  components: [],
+  components: null,
   setComponents: (components: Component[]) => set({ components }),
-  devices: [],
+  devices: null,
   setDevices: (devices: Device[]) => set({ devices }),
+  NotificationCount: 0,
+  setNotificationCount: (NotificationCount: number) =>
+    set({ NotificationCount }),
   notifications: [],
   setNotifications: (notifications: Notification[]) => set({ notifications }),
 }));

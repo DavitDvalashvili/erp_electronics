@@ -16,14 +16,17 @@ const AddComponent = () => {
       .post(`${API_URL}/addDevice`, formData)
       .then((res) => {
         if (res.data.status === "inserted") {
-          setDevices([
-            {
-              ...formData,
-              id: res.data.insert_id,
-              images: [{ image_id: null, image_url: "" }],
-            },
-            ...devices,
-          ]);
+          if (devices) {
+            setDevices([
+              {
+                ...formData,
+                id: res.data.insert_id,
+                images: [{ image_id: null, image_url: "" }],
+              },
+              ...devices,
+            ]);
+          }
+
           setResponse(res.data);
           setModal(null);
         }
