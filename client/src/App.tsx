@@ -13,6 +13,7 @@ import { create } from "zustand";
 import { NotificationPage } from "./pages/Main/NotificationPage";
 import "./App.css";
 import PageNotFound from "./pages/PageNotFound";
+import axios from "axios";
 
 type AppStatus = "Success" | "Loading" | "Server Error" | null;
 type Response = ResponseStatus | null;
@@ -39,9 +40,10 @@ type UseElectronics = {
   setNotificationCount: (NotificationCount: number) => void;
   notifications: Notification[];
   setNotifications: (notification: Notification[]) => void;
+  getNotifications: () => void;
 };
 
-export const useElectronics = create<UseElectronics>((set) => ({
+export const useElectronics = create<UseElectronics>((set, get) => ({
   API_URL: "http://localhost:5000",
   response: null,
   setResponse: (response: Response) => set({ response }),
@@ -58,6 +60,21 @@ export const useElectronics = create<UseElectronics>((set) => ({
     set({ NotificationCount }),
   notifications: [],
   setNotifications: (notifications: Notification[]) => set({ notifications }),
+
+  getNotifications: async () => {
+    const { API_URL, setAppStatus, setNotifications } = get();
+    setAppStatus("Loading");
+    try {
+      const res = await axios.get(`${API_URL}/getNotification`);
+      if (res.status === 200) {
+        setNotifications(res.data);
+      }
+      setAppStatus("Success");
+    } catch (error) {
+      console.log(error);
+      setAppStatus("Server Error");
+    }
+  },
 }));
 
 function App() {

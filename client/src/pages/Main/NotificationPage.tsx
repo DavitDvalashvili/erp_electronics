@@ -20,7 +20,7 @@ export const NotificationPage = () => {
     notifications,
     setNotifications,
     components,
-    setAppStatus,
+    getNotifications,
   } = useElectronics();
 
   const { API_URL } = useElectronics();
@@ -63,22 +63,6 @@ export const NotificationPage = () => {
       })
       .catch((error) => {
         console.log(error);
-      });
-  };
-
-  const getNotifications = async () => {
-    setAppStatus("Loading");
-    await axios
-      .get(`${API_URL}/getNotification`)
-      .then((res) => {
-        if (res.status == 200) {
-          setNotifications(res.data);
-        }
-        setAppStatus("Success");
-      })
-      .catch((error) => {
-        console.log(error);
-        setAppStatus("Server Error");
       });
   };
 
