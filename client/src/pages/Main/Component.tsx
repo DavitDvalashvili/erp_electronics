@@ -22,8 +22,15 @@ import { useNavigate } from "react-router-dom";
 const Component = () => {
   const [component, setComponent] = useState(defaultComponent);
   const [images, setImages] = useState<Image[]>([]);
-  const { API_URL, appStatus, setAppStatus, modal, setModal, setResponse } =
-    useElectronics();
+  const {
+    API_URL,
+    appStatus,
+    setAppStatus,
+    modal,
+    setModal,
+    setResponse,
+    getNotifications,
+  } = useElectronics();
   const { id } = useParams();
 
   const getComponent = async () => {
@@ -59,6 +66,7 @@ const Component = () => {
         if (res.data.status === "deleted") {
           setModal(null);
           navigate("/components");
+          getNotifications();
         }
         setResponse(res.data);
       })

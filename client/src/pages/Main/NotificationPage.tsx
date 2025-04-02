@@ -16,7 +16,7 @@ export const NotificationPage = () => {
   const {
     setResponse,
     appStatus,
-    setNotificationCount,
+
     notifications,
     setNotifications,
     components,
@@ -69,13 +69,6 @@ export const NotificationPage = () => {
   useEffect(() => {
     getNotifications();
   }, [components]);
-
-  useEffect(() => {
-    setNotificationCount(
-      notifications.filter((notification) => notification.activeStatus === 1)
-        .length
-    );
-  }, [notifications, components]);
 
   if (appStatus === "Loading") return <Loading />;
   if (appStatus === "Server Error") return <ServerError />;

@@ -36,15 +36,13 @@ type UseElectronics = {
   setComponents: (components: Component[]) => void;
   devices: Device[] | null;
   setDevices: (devices: Device[]) => void;
-  NotificationCount: number;
-  setNotificationCount: (NotificationCount: number) => void;
   notifications: Notification[];
   setNotifications: (notification: Notification[]) => void;
   getNotifications: () => void;
 };
 
 export const useElectronics = create<UseElectronics>((set, get) => ({
-  API_URL: "http://localhost:5000",
+  API_URL: `${import.meta.env.VITE_API_URL}`,
   response: null,
   setResponse: (response: Response) => set({ response }),
   appStatus: "Loading",
@@ -55,9 +53,6 @@ export const useElectronics = create<UseElectronics>((set, get) => ({
   setComponents: (components: Component[]) => set({ components }),
   devices: null,
   setDevices: (devices: Device[]) => set({ devices }),
-  NotificationCount: 0,
-  setNotificationCount: (NotificationCount: number) =>
-    set({ NotificationCount }),
   notifications: [],
   setNotifications: (notifications: Notification[]) => set({ notifications }),
 

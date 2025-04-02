@@ -9,7 +9,7 @@ import { useElectronics } from "../App";
 type ActivePage = "components" | "devices" | "notification" | "todo" | string;
 
 const NavigationLayout = () => {
-  const { NotificationCount } = useElectronics();
+  const { notifications } = useElectronics();
   const [activePage, setActivePage] = useState<ActivePage>("components");
 
   const location = useLocation();
@@ -55,9 +55,13 @@ const NavigationLayout = () => {
             >
               <div className="relative">
                 <IoMdNotifications className="w-[3rem] h-[3rem]" />
-                {NotificationCount > 0 && (
+                {notifications.length > 0 && (
                   <span className="bg-errorRed absolute top-[-0.5rem] left-[1.5rem] px-3 rounded-full text-[1.2rem] text-white">
-                    {NotificationCount}
+                    {
+                      notifications.filter(
+                        (notification) => notification.activeStatus === 1
+                      ).length
+                    }
                   </span>
                 )}
               </div>

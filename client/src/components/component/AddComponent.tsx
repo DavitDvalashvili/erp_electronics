@@ -8,8 +8,14 @@ import { useState } from "react";
 const AddComponent = () => {
   const [formData, setFormData] = useState<Component>(defaultComponent);
 
-  const { API_URL, setResponse, setModal, components, setComponents } =
-    useElectronics();
+  const {
+    API_URL,
+    setResponse,
+    setModal,
+    components,
+    setComponents,
+    getNotifications,
+  } = useElectronics();
 
   const addComponent = async () => {
     await axios
@@ -26,7 +32,7 @@ const AddComponent = () => {
               ...components,
             ]);
           }
-
+          getNotifications();
           setResponse(res.data);
           setModal(null);
         }

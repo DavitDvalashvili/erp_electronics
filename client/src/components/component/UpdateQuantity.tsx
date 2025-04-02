@@ -31,8 +31,7 @@ const UpdateQuantity = ({
     setComponents,
     components,
     setModal,
-    setNotificationCount,
-    NotificationCount,
+    getNotifications,
   } = useElectronics();
   const [quantity, setQuantity] = useState<Quantity>(defaultQuantity);
   const [newQuantity, setNewQuantity] = useState<number>(0);
@@ -65,14 +64,6 @@ const UpdateQuantity = ({
       )
       .then((res) => {
         if (res.data.status === "updated") {
-          if (
-            updatedComponent.available_quantity <
-            updatedComponent.required_quantity
-          ) {
-            setNotificationCount(NotificationCount + 1);
-          } else {
-            setNotificationCount(NotificationCount - 1);
-          }
           setComponents([
             updatedComponent,
             ...(components
@@ -81,6 +72,7 @@ const UpdateQuantity = ({
                 )
               : []),
           ]);
+          getNotifications();
           setCurrentComponent(updatedComponent);
           setModal(null);
           setQuantity(defaultQuantity);
