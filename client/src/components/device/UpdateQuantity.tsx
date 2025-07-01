@@ -51,12 +51,11 @@ const UpdateQuantity = ({ currentDevice, setCurrentDevice }: updateDevice) => {
     await axios
       .post(`${API_URL}/updateDevice/${currentDevice.id}`, updatedDevice)
       .then((res) => {
-        if (res.data.status === "updated" && devices) {
+        if (res.data.status === "updated") {
           setDevices([
             updatedDevice,
             ...devices.filter((device) => device.id !== updatedDevice.id),
           ]);
-
           console.log(res.data);
           setCurrentDevice(updatedDevice);
           setModal(null);

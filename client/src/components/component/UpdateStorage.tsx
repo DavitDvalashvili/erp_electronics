@@ -27,14 +27,13 @@ const UpdateStorage = ({
         currentComponent
       )
       .then((res) => {
-        if (res.data.status === "updated" && components) {
+        if (res.data.status === "updated") {
           setComponents([
             currentComponent,
             ...components.filter(
               (component) => component.id !== currentComponent.id
             ),
           ]);
-
           setModal(null);
           console.log(res.data);
         }

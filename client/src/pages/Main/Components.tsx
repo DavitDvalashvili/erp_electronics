@@ -9,7 +9,7 @@ import ServerError from "../ServerError";
 import FilterBox from "../../components/component/FilterBox";
 import { FaSortAmountUpAlt } from "react-icons/fa";
 import { ImDrawer } from "react-icons/im";
-import SearchBox from "../../components/SearchBox";
+import SearchBox from "../../components/component/SearchBox";
 import { Link } from "react-router-dom";
 import AddComponent from "../../components/component/AddComponent";
 import UpdateQuantity from "../../components/component/UpdateQuantity";
@@ -30,18 +30,16 @@ const Components = () => {
   } = useElectronics();
 
   const [searchQuery, setSearchQuery] = useState<QueryComponent>(defaultQuery);
-  const [searchValue, setSearchValue] = useState<string>("");
   const [showFilter, setShowFilter] = useState<boolean>(false);
   const [queryString, setQuerystring] = useState("");
   const [currentComponent, setCurrentComponent] =
     useState<Component>(defaultComponent);
 
   const getComponents = async () => {
-    setAppStatus("Loading");
     await axios
       .get(`${API_URL}/getComponents?${queryString}`)
       .then((res) => {
-        if (res.status == 200) {
+        if (res.status === 200) {
           setComponents(res.data);
         }
         setAppStatus("Success");
@@ -72,20 +70,8 @@ const Components = () => {
     setShowFilter(!showFilter);
   };
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      if (searchQuery.searchTerm !== searchValue) {
-        setSearchQuery({
-          ...searchQuery,
-          searchTerm: searchValue,
-        });
-      }
-    }, 500);
-
-    return () => clearTimeout(handler);
-  }, [searchValue]);
-
   if (appStatus === "Server Error") return <ServerError />;
+  if (appStatus === "Loading") return <Loading />;
 
   return (
     <section className=" bg-green-500 h-screen w-full overflow-y-scroll font-firago font-feature">
@@ -107,8 +93,8 @@ const Components = () => {
           </button>
 
           <SearchBox
-            searchValue={searchValue}
-            setSearchValue={setSearchValue}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
           />
 
           <button
@@ -131,15 +117,14 @@ const Components = () => {
           />
         )}
       </div>
-      {appStatus === "Loading" ? <Loading /> : null}
-      {components?.length === 0 ? (
+      {components.length === 0 ? (
         <ResultNotFound name="კომპონენტი" />
       ) : (
         <div
           className={`grid grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-6 font-medium text-textColor 
           text-[1.4rem] px-[5.6rem] pb-[4rem] ${showFilter ? "mt-[28.6rem]" : "mt-[18rem]"} `}
         >
-          {components?.map((component, index) => (
+          {components.map((component, index) => (
             <div
               key={index}
               className="bg-white p-8 rounded-[1rem] overflow-hidden "

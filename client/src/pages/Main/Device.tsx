@@ -12,22 +12,19 @@ import { MdDelete } from "react-icons/md";
 import { GrUpdate } from "react-icons/gr";
 import UpdateQuantity from "../../components/device/UpdateQuantity";
 import ImageBox from "../../components/ImageBox";
-import DeleteForm from "../../components/DeleteForm";
+import DeleteDevice from "../../components/device/DeleteDevice";
 import { Components } from "../../components/device/Components";
 import { FastenComponent } from "../../components/device/FastenComponent";
 import { defaultDevice } from "../../data/devices";
-import { useNavigate } from "react-router-dom";
 
 const Device = () => {
   const [device, setDevice] = useState<Device>(defaultDevice);
   const [images, setImages] = useState<Image[]>([]);
-  const { API_URL, appStatus, setAppStatus, modal, setModal, setResponse } =
+  const { API_URL, appStatus, setAppStatus, modal, setModal } =
     useElectronics();
   const { id } = useParams();
-  const navigate = useNavigate();
 
   const getDevice = async () => {
-    setAppStatus("Loading");
     await axios
       .get(`${API_URL}/getDevice/${id}`)
       .then((res) => {
@@ -49,21 +46,6 @@ const Device = () => {
   useEffect(() => {
     setImages(device.images);
   }, [device]);
-
-  const deleteDevice = async () => {
-    await axios
-      .delete(`${API_URL}/deleteDevice/${device.id}`)
-      .then((res) => {
-        if (res.data.status === "deleted") {
-          setModal(null);
-          navigate("/devices");
-        }
-        setResponse(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
 
   if (appStatus === "Server Error") return <ServerError />;
   if (appStatus === "Loading") return <Loading />;
@@ -183,9 +165,7 @@ const Device = () => {
       {modal === "update" && (
         <UpdateDevice device={device} setDevice={setDevice} />
       )}
-      {modal === "delete" && (
-        <DeleteForm deleteFunction={deleteDevice} name="მოწყობილობა" />
-      )}
+      {modal === "delete" && <DeleteDevice device={device} />}
       {modal === "view_components" && <Components deviceId={device.id} />}
       {modal === "fasten_components" && (
         <FastenComponent deviceId={device.id} />

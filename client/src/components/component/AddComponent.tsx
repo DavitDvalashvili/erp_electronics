@@ -8,31 +8,22 @@ import { useState } from "react";
 const AddComponent = () => {
   const [formData, setFormData] = useState<Component>(defaultComponent);
 
-  const {
-    API_URL,
-    setResponse,
-    setModal,
-    components,
-    setComponents,
-    getNotifications,
-  } = useElectronics();
+  const { API_URL, setResponse, setModal, components, setComponents } =
+    useElectronics();
 
   const addComponent = async () => {
     await axios
       .post(`${API_URL}/addComponent`, formData)
       .then((res) => {
         if (res.data.status === "inserted") {
-          if (components) {
-            setComponents([
-              {
-                ...formData,
-                id: res.data.insert_id,
-                images: [{ image_id: null, image_url: "" }],
-              },
-              ...components,
-            ]);
-          }
-          getNotifications();
+          setComponents([
+            {
+              ...formData,
+              id: res.data.insert_id,
+              images: [{ image_id: null, image_url: "" }],
+            },
+            ...components,
+          ]);
           setResponse(res.data);
           setModal(null);
         }

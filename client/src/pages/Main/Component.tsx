@@ -10,31 +10,22 @@ import { ImDrawer } from "react-icons/im";
 import { FaSortAmountUpAlt } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { GrUpdate } from "react-icons/gr";
-import DeleteForm from "../../components/DeleteForm";
+import DeleteComponent from "../../components/component/DeleteComponent";
 import UpdateStorage from "../../components/component/UpdateStorage";
 import UpdateQuantity from "../../components/component/UpdateQuantity";
 import ImageBox from "../../components/ImageBox";
 import { MdOutlinePictureAsPdf } from "react-icons/md";
 import PdfViewer from "../../components/component/PdfViewer";
 import { defaultComponent } from "../../data/components";
-import { useNavigate } from "react-router-dom";
 
 const Component = () => {
   const [component, setComponent] = useState(defaultComponent);
   const [images, setImages] = useState<Image[]>([]);
-  const {
-    API_URL,
-    appStatus,
-    setAppStatus,
-    modal,
-    setModal,
-    setResponse,
-    getNotifications,
-  } = useElectronics();
+  const { API_URL, appStatus, setAppStatus, modal, setModal } =
+    useElectronics();
   const { id } = useParams();
 
   const getComponent = async () => {
-    setAppStatus("Loading");
     await axios
       .get(`${API_URL}/getComponent/${id}`)
       .then((res) => {
@@ -56,24 +47,6 @@ const Component = () => {
   useEffect(() => {
     setImages(component.images);
   }, [component]);
-
-  const navigate = useNavigate();
-
-  const deleteComponent = async () => {
-    await axios
-      .delete(`${API_URL}/deleteComponent/${component.id}`)
-      .then((res) => {
-        if (res.data.status === "deleted") {
-          setModal(null);
-          navigate("/components");
-          getNotifications();
-        }
-        setResponse(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
 
   if (appStatus === "Server Error") return <ServerError />;
   if (appStatus === "Loading") return <Loading />;
@@ -243,9 +216,7 @@ const Component = () => {
       {modal === "update" && (
         <UpdateComponent component={component} setComponent={setComponent} />
       )}
-      {modal === "delete" && (
-        <DeleteForm deleteFunction={deleteComponent} name="კომპონენტი" />
-      )}
+      {modal === "delete" && <DeleteComponent component={component} />}
       {modal === "update_position" && (
         <UpdateStorage
           currentComponent={component}

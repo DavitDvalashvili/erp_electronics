@@ -1,12 +1,27 @@
-import { Dispatch } from "react";
+import { useEffect, useState } from "react";
 import { IoSearch } from "react-icons/io5";
 
 type SearchBoxProps = {
-  searchValue: string;
-  setSearchValue: Dispatch<React.SetStateAction<string>>;
+  searchQuery: QueryComponent;
+  setSearchQuery: (query: QueryComponent) => void;
 };
 
-const SearchBox = ({ searchValue, setSearchValue }: SearchBoxProps) => {
+const SearchBox = ({ searchQuery, setSearchQuery }: SearchBoxProps) => {
+  const [searchValue, setSearchValue] = useState<string>("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (searchQuery.searchTerm !== searchValue) {
+        setSearchQuery({
+          ...searchQuery,
+          searchTerm: searchValue,
+        });
+      }
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [searchValue]);
+
   return (
     <div className="h-[5rem] text-[1.8rem] flex justify-start items-center w-fit rounded-default overflow-hidden bg-white px-4 ml-auto">
       <input

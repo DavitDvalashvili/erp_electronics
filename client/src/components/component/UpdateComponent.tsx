@@ -12,7 +12,7 @@ type updateComponent = {
 
 const UpdateComponent = ({ component, setComponent }: updateComponent) => {
   const [formData, setFormData] = useState<Component>(component);
-  const { API_URL, setResponse, setModal, getNotifications } = useElectronics();
+  const { API_URL, setResponse, setModal } = useElectronics();
 
   const updateComponent = async () => {
     await axios
@@ -21,7 +21,6 @@ const UpdateComponent = ({ component, setComponent }: updateComponent) => {
         if (res.data.status === "updated") {
           setComponent(formData);
           setResponse(res.data);
-          getNotifications();
           setModal(null);
         }
       })

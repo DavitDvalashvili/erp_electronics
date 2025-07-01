@@ -20,9 +20,7 @@ export const addImage = async (req: Request, res: Response) => {
 
     if (fileName) {
       const result = await conn.query(
-        `INSERT INTO images (image_url, ${
-          type === "component" ? "component_id" : "device_id"
-        }) VALUES (?, ?)`,
+        `INSERT INTO images (image_url, device_type_id) VALUES (?, ?)`,
         [fileName, Id]
       );
 

@@ -10,6 +10,7 @@ type ActivePage = "components" | "devices" | "notification" | "todo" | string;
 
 const NavigationLayout = () => {
   const { notifications } = useElectronics();
+  const [unreadCount, setUnreadCount] = useState<number>(0);
   const [activePage, setActivePage] = useState<ActivePage>("components");
 
   const location = useLocation();
@@ -18,6 +19,14 @@ const NavigationLayout = () => {
   useEffect(() => {
     setActivePage(pathname.slice(1).split("/")[0]);
   }, [pathname]);
+
+  useEffect(() => {
+    setUnreadCount(
+      notifications.filter(
+        (notification) => Number(notification.activeStatus) === 1
+      ).length
+    );
+  }, notifications);
 
   return (
     <aside
@@ -51,17 +60,13 @@ const NavigationLayout = () => {
           </Link>
           <Link to="/notification">
             <li
-              className={`flex gap-8 py-4 rounded-default px-[3rem] xl:px-[6rem] relative ${activePage === "notification" ? "bg-bgColor text-white" : "text-textColor"}`}
+              className={`flex gap-8 py-6 rounded-default px-[3rem] xl:px-[6rem] relative ${activePage === "notification" ? "bg-bgColor text-white" : "text-textColor"}`}
             >
               <div className="relative">
                 <IoMdNotifications className="w-[3rem] h-[3rem]" />
-                {notifications.length > 0 && (
+                {unreadCount > 0 && (
                   <span className="bg-errorRed absolute top-[-0.5rem] left-[1.5rem] px-3 rounded-full text-[1.2rem] text-white">
-                    {
-                      notifications.filter(
-                        (notification) => notification.activeStatus === 1
-                      ).length
-                    }
+                    {unreadCount}
                   </span>
                 )}
               </div>

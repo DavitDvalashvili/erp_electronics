@@ -20,7 +20,7 @@ app.use(
 
 app.use(
   cors({
-    origin: `${CLIENT_API_URL}`,
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })

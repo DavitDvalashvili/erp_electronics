@@ -25,14 +25,8 @@ const UpdateQuantity = ({
   currentComponent,
   setCurrentComponent,
 }: updateComponent) => {
-  const {
-    API_URL,
-    setResponse,
-    setComponents,
-    components,
-    setModal,
-    getNotifications,
-  } = useElectronics();
+  const { API_URL, setResponse, setComponents, components, setModal } =
+    useElectronics();
   const [quantity, setQuantity] = useState<Quantity>(defaultQuantity);
   const [newQuantity, setNewQuantity] = useState<number>(0);
 
@@ -66,13 +60,10 @@ const UpdateQuantity = ({
         if (res.data.status === "updated") {
           setComponents([
             updatedComponent,
-            ...(components
-              ? components.filter(
-                  (component) => component.id !== updatedComponent.id
-                )
-              : []),
+            ...components.filter(
+              (component) => component.id !== updatedComponent.id
+            ),
           ]);
-          getNotifications();
           setCurrentComponent(updatedComponent);
           setModal(null);
           setQuantity(defaultQuantity);

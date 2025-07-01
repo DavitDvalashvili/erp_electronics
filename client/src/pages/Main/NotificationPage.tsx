@@ -2,9 +2,6 @@ import { IoMdNotificationsOff } from "react-icons/io";
 import { useElectronics } from "../../App";
 import { IoMdNotifications } from "react-icons/io";
 import axios from "axios";
-import ServerError from "../ServerError";
-import Loading from "../Loading";
-import { useEffect } from "react";
 
 type Notification = {
   id: string | number;
@@ -13,22 +10,14 @@ type Notification = {
 };
 
 export const NotificationPage = () => {
-  const {
-    setResponse,
-    appStatus,
-
-    notifications,
-    setNotifications,
-    components,
-    getNotifications,
-  } = useElectronics();
+  const { notifications, setNotifications, setResponse } = useElectronics();
 
   const { API_URL } = useElectronics();
 
   const updateNotification = async (notification: Notification) => {
     const updatedNotification = {
       ...notification,
-      activeStatus: Number(!Boolean(notification.activeStatus)),
+      activeStatus: Number(!notification.activeStatus),
     };
 
     await axios
@@ -66,13 +55,6 @@ export const NotificationPage = () => {
       });
   };
 
-  useEffect(() => {
-    getNotifications();
-  }, [components]);
-
-  if (appStatus === "Loading") return <Loading />;
-  if (appStatus === "Server Error") return <ServerError />;
-
   return (
     <section className=" bg-green-500 h-screen w-full overflow-y-scroll font-firago font-feature">
       <div className="fixed t-0 w-[calc(100vw-28.5rem)] xl:w-[calc(192rem-38.5rem)] bg-bgColorSecondary px-[5.6rem] pt-[4rem] pb-[3rem]">
@@ -82,13 +64,13 @@ export const NotificationPage = () => {
             <span>შეტყობინებები</span>
           </div>
         </div>
-        {notifications?.length === 0 && (
+        {notifications.length == 0 && (
           <div className="mt-[-9rem] flex flex-col gap-8 justify-center items-center  text-textColor font-medium text-[3rem] w-full h-screen">
             <IoMdNotificationsOff className="w-[10rem] h-[10rem] text-errorRed" />
             <p>შეტყობინება არ მოიძებნა</p>
           </div>
         )}
-        {notifications?.length > 0 && (
+        {notifications.length > 0 && (
           <table className="table-auto  border-collapse text-[1.4rem] bg-white mt-8 mr-[20rem] rounded-default pb-8 overflow-hidden">
             <thead>
               <tr>
@@ -105,25 +87,24 @@ export const NotificationPage = () => {
             </thead>
             <tbody>
               {notifications?.map((notification, index) => (
-                <tr key={index}>
+                <tr
+                  key={index}
+                  className={`${notification.activeStatus ? "bg-[#c2dbff]" : ""}`}
+                >
                   <td
-                    className={`text-[1.4rem] font-medium py-2 px-6 text-center ${notification.activeStatus ? "bg-[#c2dbff]" : ""}`}
+                    className={`text-[1.4rem] font-medium py-2 px-6 text-center `}
                   >
                     {index + 1}
                   </td>
                   <td
-                    className={`${notification.activeStatus ? "bg-[#c2dbff]" : ""}  text-[1.4rem] font-medium py-2 px-4 text-left`}
+                    className={`text-[1.4rem] font-medium py-2 px-4 text-left`}
                   >
                     {notification.name}
                   </td>
-                  <td
-                    className={`${notification.activeStatus ? "bg-[#c2dbff]" : ""} text-[1.4rem] font-medium py-2 text-left`}
-                  >
+                  <td className={` text-[1.2rem] font-medium py-2 text-left`}>
                     კომპონენტის რაოდენობა დასაშვებზე ნაკლებია
                   </td>
-                  <td
-                    className={`${notification.activeStatus ? "bg-[#c2dbff]" : ""} px-[8rem] gap-8 flex justify-center py-4`}
-                  >
+                  <td className={` px-[8rem] gap-8 flex justify-center py-4`}>
                     <button
                       className=" h-[3rem] px-4  rounded-default
                     border border-bgColor text-bgColor font-bold hover:bg-bgColor transition duration-300
